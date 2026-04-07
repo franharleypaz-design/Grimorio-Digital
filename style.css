@@ -1,0 +1,253 @@
+/* =========================================
+   VARIABLES Y CONFIGURACIÓN BASE
+   ========================================= */
+:root {
+    --bg-dark: #121212;          /* Fondo general oscuro */
+    --sidebar-bg: #1e1e1e;       /* Fondo lateral */
+    --text-color: #e0e0e0;       /* Texto claro */
+    --accent: #d4af37;           /* Dorado MyL */
+    --myl-blue: #1a237e;         /* Azul profundo MyL */
+    --header-height: 100px;      /* Altura fija de cabecera */
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; 
+}
+
+/* =========================================
+   CABECERA
+   ========================================= */
+.main-header {
+    display: flex;
+    align-items: stretch;
+    height: var(--header-height);
+    background-color: transparent;
+    border-bottom: 3px solid var(--accent);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    z-index: 100;
+}
+
+.header-identity-block {
+    background-color: #ffffff;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    border-right: 2px solid #ddd;
+    min-width: 400px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.main-logo {
+    height: 85px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text h1 {
+    font-size: 1.4rem;
+    margin: 0;
+    line-height: 1;
+    color: #222;
+    font-weight: 800;
+}
+
+.logo-text h1 span.accent-on-light {
+    color: var(--myl-blue);
+}
+
+.logo-text .subtitle {
+    margin: 4px 0 0 0;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.header-action-block {
+    flex-grow: 1;
+    background: linear-gradient(180deg, var(--myl-blue) 0%, #0d124a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+}
+
+.search-container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-container input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border-radius: 6px;
+    border: none;
+    background-color: rgba(255,255,255,0.9);
+    font-size: 1rem;
+    outline: none;
+}
+
+.btn-advanced {
+    background-color: var(--accent);
+    color: #000;
+    border: none;
+    padding: 0 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* =========================================
+   LAYOUT PRINCIPAL
+   ========================================= */
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    padding: 25px;
+    border-right: 1px solid #333;
+    overflow-y: auto;
+}
+
+.filter-group {
+    margin-bottom: 30px;
+}
+
+.filter-group h3 {
+    font-size: 0.85rem;
+    color: var(--accent);
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.filter-group ul {
+    list-style: none;
+    padding: 0;
+}
+
+.filter-group li {
+    margin: 10px 0;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    background-image: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%);
+}
+
+#results-info {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #888;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+/* =========================================
+   ESTILO DE LAS CARTAS (MOVIMIENTO AÑADIDO)
+   ========================================= */
+.card-item {
+    width: 200px;
+    min-height: 280px;
+    background-color: #252525;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #444;
+    cursor: pointer;
+    position: relative;
+    /* TRANSICIÓN PARA EL MOVIMIENTO */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* ESTO ES LO QUE HACE QUE SE MUEVA */
+.card-item:hover {
+    transform: translateY(-10px); /* Sube la carta */
+    border-color: var(--accent);   /* Borde dorado */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.card-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* =========================================
+   PANEL DE DETALLE
+   ========================================= */
+.detail-panel {
+    position: fixed;
+    right: -450px; 
+    top: var(--header-height);
+    bottom: 0;
+    width: 380px;
+    background-color: #0c0c0c;
+    border-left: 2px solid var(--accent);
+    z-index: 200;
+    transition: all 0.4s ease-in-out;
+    padding: 30px;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.9);
+}
+
+.detail-panel.active {
+    right: 0;
+}
+
+#close-detail {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+.detail-content img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.detail-hability {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent);
+    font-style: italic;
+    line-height: 1.5;
+}

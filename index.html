@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca MyL - Primera Era</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-identity-block">
+            <div class="logo-container">
+                <img src="logo-fenix.png" alt="Fénix MyL" class="main-logo">
+                <div class="logo-text">
+                    <h1>BIBLIOTECA DE <span class="accent-on-light">MITOS Y LEYENDAS</span></h1>
+                    <p class="subtitle">PRIMERA ERA & BLOQUE</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-action-block">
+            <div class="search-container">
+                <input type="text" id="main-search" placeholder="Buscar por nombre, tipo, raza, habilidad...">
+                <button class="btn-advanced">Avanzada</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <section class="filter-group">
+                <h3>EDICIONES</h3>
+                <ul>
+                    <li><label><input type="checkbox" value="espada-sagrada"> Espada Sagrada</label></li>
+                    <li><label><input type="checkbox" value="helenica"> Helénica</label></li>
+                    <li><label><input type="checkbox" value="hijos-daana"> Hijos de Daana</label></li>
+                </ul>
+            </section>
+
+            <section class="filter-group">
+                <h3>TIPOS DE CARTA</h3>
+                <ul>
+                    <li><label><input type="checkbox" value="aliado"> Aliado</label></li>
+                    <li><label><input type="checkbox" value="totem"> Tótem</label></li>
+                    <li><label><input type="checkbox" value="talisman"> Talismán</label></li>
+                    <li><label><input type="checkbox" value="oro"> Oro</label></li>
+                </ul>
+            </section>
+
+            <section class="filter-group">
+                <h3>RAZAS</h3>
+                <select id="raza-filter">
+                    <option value="">Todas las razas</option>
+                    <option value="caballero">Caballero</option>
+                    <option value="dragon">Dragón</option>
+                    <option value="guerrero">Guerrero</option>
+                </select>
+            </section>
+        </aside>
+
+        <main class="content">
+            <div id="results-info">
+                Mostrando <span id="card-count">0</span> cartas encontradas
+            </div>
+            
+            <div class="card-grid" id="card-display">
+                <div class="card-placeholder">
+                    Cargando grimorio...
+                </div>
+            </div>
+        </main>
+
+        <div id="card-detail-panel" class="detail-panel">
+            <div class="detail-content">
+                <button id="close-detail">×</button>
+                <img src="" id="detail-img" alt="Carta">
+                <h2 id="detail-name">Nombre</h2>
+                <p id="detail-type">Tipo</p>
+                <div class="detail-hability" id="detail-text">Habilidad...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
