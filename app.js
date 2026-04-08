@@ -1,4 +1,4 @@
-// CONFIGURACIÓN FIREBASE
+// 1. CONFIGURACIÓN FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyB1OmhfpwB-wjsnjhunDCm9Lev5yXLO3E4",
     authDomain: "bibliotecamyl-88ab5.firebaseapp.com",
@@ -12,7 +12,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// VARIABLES
+// 2. VARIABLES GLOBALES
 let cartasMyL = []; 
 let usuarioActual = null;
 let modoCarpeta = false;
@@ -22,7 +22,7 @@ const count = document.getElementById('card-count');
 const buscador = document.getElementById('main-search');
 const panel = document.getElementById('card-detail-panel');
 
-// CARGAR DATOS
+// 3. CARGA DE DATOS
 async function cargarGrimorio() {
     try {
         const respuesta = await fetch('cartas.json');
@@ -31,7 +31,7 @@ async function cargarGrimorio() {
     } catch (error) { console.error("Error cargando grimorio:", error); }
 }
 
-// FILTRADO
+// 4. LÓGICA DE FILTRADO
 async function filtrarCartas() {
     const texto = buscador.value.toLowerCase();
     const raza = document.getElementById('raza-filter').value.toLowerCase();
@@ -54,7 +54,6 @@ async function filtrarCartas() {
 
     const resultado = cartasMyL.filter(c => {
         if (modoCarpeta && !idsGuardados.includes(c.ID)) return false;
-
         const matchTexto = c.Nombre.toLowerCase().includes(texto) || (c.Habilidad && c.Habilidad.toLowerCase().includes(texto));
         const matchRaza = raza === "" || (c.Raza && c.Raza.toLowerCase() === raza);
         const matchEdicion = ediciones.length === 0 || ediciones.includes(c.Carpeta_Edicion.toLowerCase().replace('_', '-'));
@@ -63,10 +62,8 @@ async function filtrarCartas() {
         const matchCoste = numCoste <= costeMax;
         const numFuerza = parseInt(c.Fuerza) || 0;
         const matchFuerza = (c.Tipo.toLowerCase() === 'aliado') ? numFuerza >= fuerzaMin : true;
-
         return matchTexto && matchRaza && matchEdicion && matchTipo && matchCoste && matchFuerza;
     });
-
     dibujarCartas(resultado);
 }
 
@@ -88,9 +85,7 @@ function mostrarDetalle(c, ruta) {
     document.getElementById('detail-name').innerText = c.Nombre;
     const stats = c.Tipo.toLowerCase() === 'aliado' ? ` | C:${c.Coste} F:${c.Fuerza}` : ` | C:${c.Coste}`;
     document.getElementById('detail-type').innerText = `${c.Tipo.toUpperCase()} ${c.Raza ? '- ' + c.Raza : ''}${stats}`;
-    
     let btnSave = `<button onclick="guardarEnCarpeta('${c.ID}')" style="width:100%; margin-top:10px; padding:12px; background:var(--accent); border:none; font-weight:bold; cursor:pointer; border-radius:5px; color:black;">📜 GUARDAR EN EL GRIMORIO</button>`;
-
     document.getElementById('detail-text').innerHTML = `
         <div style="font-style:italic; line-height:1.5;">${c.Habilidad || c.Hability}</div>
         ${btnSave}
@@ -99,7 +94,6 @@ function mostrarDetalle(c, ruta) {
     panel.classList.add('active');
 }
 
-// FUNCIONES CARPETA (EL GRIMORIO)
 function toggleCarpeta() {
     if (!usuarioActual) {
         mostrarNotificacion("Debes invocar tu sesión primero", "👁️");
@@ -109,13 +103,11 @@ function toggleCarpeta() {
     document.getElementById('sidebar').style.width = '0px';
     document.getElementById('sidebar').style.padding = '0px';
     document.getElementById('sidebar').style.overflow = 'hidden';
-    
     const nombreUsuario = usuarioActual.displayName ? usuarioActual.displayName.split(' ')[0].toUpperCase() : "DEL GLADIADOR";
     document.getElementById('folder-header').innerHTML = `
         <h2 style="color: var(--accent); margin: 0; letter-spacing: 2px;">📖 EL GRIMORIO DE ${nombreUsuario}</h2>
         <button onclick="salirDeCarpeta()" style="background: var(--accent); color: black; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">← VOLVER AL REINO</button>
     `;
-    
     document.getElementById('folder-header').style.display = 'flex';
     filtrarCartas();
 }
@@ -138,7 +130,6 @@ async function guardarEnCarpeta(id) {
     try {
         const doc = await docRef.get();
         let lista = doc.exists ? doc.data().cartas || [] : [];
-        
         if (lista.includes(id)) {
             lista = lista.filter(item => item !== id);
             mostrarNotificacion("Carta desterrada del Grimorio.", "🗑️");
@@ -151,57 +142,46 @@ async function guardarEnCarpeta(id) {
     } catch (e) { console.error(e); }
 }
 
-// 8. AUTH (CON MENSAJE DE BIENVENIDA RESTAURADO)
+// 8. AUTENTICACIÓN (Sincronización de interfaz)
 auth.onAuthStateChanged(user => {
-    const loginBtn = document.getElementById('btn-login');
-    const userSection = document.getElementById('user-logged');
-    
-    if (user) {
-        if (!usuarioActual) {
-            const nombre = user.displayName ? user.displayName.split(' ')[0] : "Gladiador";
-            mostrarNotificacion(`¡Bienvenido al Reino, ${nombre}!`, "⚔️");
-        }
-        
-        usuarioActual = user;
-        if(loginBtn) loginBtn.style.display = 'none';
-        if(userSection) userSection.style.display = 'flex';
-        
+    usuarioActual = user;
+    document.getElementById('btn-login').style.display = user ? 'none' : 'block';
+    document.getElementById('user-logged').style.display = user ? 'flex' : 'none';
+    if(user) {
         const photo = document.getElementById('user-photo');
-        if(photo) {
-            photo.src = user.photoURL;
-            photo.referrerPolicy = "no-referrer";
-        }
-    } else {
-        if (usuarioActual) {
-            mostrarNotificacion("Has abandonado el Reino...", "🌙");
-        }
-        usuarioActual = null;
-        if(loginBtn) loginBtn.style.display = 'block';
-        if(userSection) userSection.style.display = 'none';
-        modoCarpeta = false;
-        salirDeCarpeta();
+        photo.src = user.photoURL;
+        photo.referrerPolicy = "no-referrer";
     }
 });
 
-// 9. LISTENERS Y BOTONES
+// 9. EVENTO DE LOGIN (¡Aquí está la bienvenida!)
 document.getElementById('btn-login').onclick = () => {
     if (typeof firebase !== 'undefined' && firebase.auth) {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
-        auth.signInWithPopup(provider).catch((error) => {
-            console.error("Error en login:", error);
-            if (error.code === 'auth/popup-blocked') {
-                auth.signInWithRedirect(provider);
-            }
-        });
+        
+        auth.signInWithPopup(provider)
+            .then((result) => {
+                // MENSAJE DE BIENVENIDA AL ENTRAR
+                const nombre = result.user.displayName ? result.user.displayName.split(' ')[0] : "Gladiador";
+                mostrarNotificacion(`¡Bienvenido al Reino, ${nombre}!`, "⚔️");
+            })
+            .catch((error) => {
+                console.error("Error en login:", error);
+                if (error.code === 'auth/popup-blocked') {
+                    auth.signInWithRedirect(provider);
+                }
+            });
     }
 };
 
-document.getElementById('btn-logout').onclick = () => auth.signOut();
-
-document.getElementById('close-detail').onclick = () => {
-    panel.classList.remove('active');
+document.getElementById('btn-logout').onclick = () => {
+    auth.signOut().then(() => {
+        mostrarNotificacion("Has abandonado el Reino...", "🌙");
+    });
 };
+
+document.getElementById('close-detail').onclick = () => panel.classList.remove('active');
 
 // LISTENERS FILTROS
 buscador.addEventListener('input', filtrarCartas);
@@ -224,28 +204,17 @@ function cartaAlAzar() {
 
 cargarGrimorio();
 
-// --- FUNCIÓN PARA MOSTRAR NOTIFICACIONES BONITAS (TOAST) ---
+// 10. NOTIFICACIONES (TOAST)
 function mostrarNotificacion(mensaje, icono = '📖') {
     const container = document.getElementById('toast-container');
     if (!container) return;
-
     const toast = document.createElement('div');
     toast.className = 'toast-notificacion';
-    toast.innerHTML = `
-        <span class="toast-icon">${icono}</span>
-        <span class="toast-mensaje">${mensaje}</span>
-    `;
-
+    toast.innerHTML = `<span class="toast-icon">${icono}</span><span class="toast-mensaje">${mensaje}</span>`;
     container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('mostrar');
-    }, 100);
-
+    setTimeout(() => { toast.classList.add('mostrar'); }, 100);
     setTimeout(() => {
         toast.classList.remove('mostrar');
-        setTimeout(() => {
-            toast.remove();
-        }, 500);
+        setTimeout(() => { toast.remove(); }, 500);
     }, 4000);
 }
