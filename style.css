@@ -251,3 +251,44 @@ body {
 #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 3000; }
 .toast-notificacion { background: #1a1a1a; border: 1px solid var(--accent); color: white; padding: 12px 20px; border-radius: 5px; margin-bottom: 10px; transform: translateX(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; }
 .toast-notificacion.mostrar { transform: translateX(0); }
+
+/* Contenedor para mantener el tamaño de la carta */
+.card-img-container {
+    width: 100%;
+    aspect-ratio: 2/2.8; /* Proporción estándar de carta MyL */
+    background: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #333;
+}
+
+/* Estilo del cuadro cuando no hay foto */
+.no-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    text-align: center;
+    background: linear-gradient(145deg, #111, #222);
+    color: var(--accent);
+    font-family: 'Cinzel', serif;
+}
+
+.no-img-placeholder span {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.no-img-placeholder small {
+    font-size: 0.6rem;
+    color: #666;
+    letter-spacing: 1px;
+}
