@@ -1,4 +1,4 @@
-// 1. CONFIGURACIÓN FIREBASE
+// CONFIGURACIÓN FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyB1OmhfpwB-wjsnjhunDCm9Lev5yXLO3E4",
     authDomain: "bibliotecamyl-88ab5.firebaseapp.com",
@@ -8,12 +8,11 @@ const firebaseConfig = {
     appId: "1:1093812970594:web:60831d9139b37c7858dd3b"
 };
 
-// Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 2. VARIABLES GLOBALES
+// VARIABLES
 let cartasMyL = []; 
 let usuarioActual = null;
 let modoCarpeta = false;
@@ -23,20 +22,16 @@ const count = document.getElementById('card-count');
 const buscador = document.getElementById('main-search');
 const panel = document.getElementById('card-detail-panel');
 
-// 3. CARGA DE DATOS
+// CARGAR DATOS
 async function cargarGrimorio() {
     try {
         const respuesta = await fetch('cartas.json');
-        if (!respuesta.ok) throw new Error("No se encontró el archivo cartas.json");
         cartasMyL = await respuesta.json();
         filtrarCartas();
-    } catch (error) {
-        console.error("Error:", error);
-        display.innerHTML = `<div class="card-placeholder">Error al cargar el grimorio...</div>`;
-    }
+    } catch (error) { console.error("Error cargando grimorio:", error); }
 }
 
-// 4. LÓGICA DE FILTRADO
+// FILTRADO
 async function filtrarCartas() {
     const texto = buscador.value.toLowerCase();
     const raza = document.getElementById('raza-filter').value.toLowerCase();
@@ -44,7 +39,7 @@ async function filtrarCartas() {
     const fuerzaMin = parseInt(document.getElementById('filter-fuerza').value);
     
     const ediciones = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]'))
-        .filter(i => i.checked && ["espada-sagrada", "helenica", "ragnarok", "hijos-daana"].includes(i.value))
+        .filter(i => i.checked && ["espada-sagrada", "helenica", "hijos-daana"].includes(i.value))
         .map(i => i.value);
 
     const tipos = Array.from(document.querySelectorAll('.filter-group input[type="checkbox"]'))
@@ -54,9 +49,7 @@ async function filtrarCartas() {
     let idsGuardados = [];
     if (modoCarpeta && usuarioActual) {
         const doc = await db.collection('carpetas').doc(usuarioActual.uid).get();
-        if (doc.exists) {
-            idsGuardados = doc.data().cartas || [];
-        }
+        if (doc.exists) idsGuardados = doc.data().cartas || [];
     }
 
     const resultado = cartasMyL.filter(c => {
@@ -66,10 +59,8 @@ async function filtrarCartas() {
         const matchRaza = raza === "" || (c.Raza && c.Raza.toLowerCase() === raza);
         const matchEdicion = ediciones.length === 0 || ediciones.includes(c.Carpeta_Edicion.toLowerCase().replace('_', '-'));
         const matchTipo = tipos.length === 0 || tipos.includes(c.Tipo.toLowerCase());
-        
         const numCoste = parseInt(c.Coste) || 0;
         const matchCoste = numCoste <= costeMax;
-
         const numFuerza = parseInt(c.Fuerza) || 0;
         const matchFuerza = (c.Tipo.toLowerCase() === 'aliado') ? numFuerza >= fuerzaMin : true;
 
@@ -79,16 +70,9 @@ async function filtrarCartas() {
     dibujarCartas(resultado);
 }
 
-// 5. RENDERIZADO DE CARTAS
 function dibujarCartas(lista) {
     display.innerHTML = '';
     count.innerText = lista.length;
-
-    if (lista.length === 0) {
-        display.innerHTML = `<div class="card-placeholder">No se hallaron registros...</div>`;
-        return;
-    }
-
     lista.forEach(c => {
         const rutaImg = `img/cartas/${c.Bloque}/${c.Carpeta_Edicion}/${c.Imagen}`;
         const div = document.createElement('div');
@@ -99,25 +83,23 @@ function dibujarCartas(lista) {
     });
 }
 
-// 6. PANEL DE DETALLE
 function mostrarDetalle(c, ruta) {
     document.getElementById('detail-img').src = ruta;
     document.getElementById('detail-name').innerText = c.Nombre;
-    
     const stats = c.Tipo.toLowerCase() === 'aliado' ? ` | C:${c.Coste} F:${c.Fuerza}` : ` | C:${c.Coste}`;
     document.getElementById('detail-type').innerText = `${c.Tipo.toUpperCase()} ${c.Raza ? '- ' + c.Raza : ''}${stats}`;
     
     let btnSave = `<button onclick="guardarEnCarpeta('${c.ID}')" style="width:100%; margin-top:10px; padding:12px; background:var(--accent); border:none; font-weight:bold; cursor:pointer; border-radius:5px; color:black;">📜 GUARDAR EN EL GRIMORIO</button>`;
 
     document.getElementById('detail-text').innerHTML = `
-        <div style="font-style:italic; line-height:1.5;">${c.Habilidad || c.Hability || "Sin habilidad."}</div>
+        <div style="font-style:italic; line-height:1.5;">${c.Habilidad || c.Hability}</div>
         ${btnSave}
         <p style="margin-top:20px; color:#666; font-size:0.8rem;">Ilustrador: ${c.Ilustrador}</p>
     `;
     panel.classList.add('active');
 }
 
-// 7. FUNCIONES DEL GRIMORIO
+// FUNCIONES CARPETA (EL GRIMORIO)
 function toggleCarpeta() {
     if (!usuarioActual) {
         mostrarNotificacion("Debes invocar tu sesión primero", "👁️");
@@ -128,6 +110,7 @@ function toggleCarpeta() {
     document.getElementById('sidebar').style.padding = '0px';
     document.getElementById('sidebar').style.overflow = 'hidden';
     
+    // Título ñoño y dinámico
     const nombreUsuario = usuarioActual.displayName ? usuarioActual.displayName.split(' ')[0].toUpperCase() : "DEL GLADIADOR";
     document.getElementById('folder-header').innerHTML = `
         <h2 style="color: var(--accent); margin: 0; letter-spacing: 2px;">📖 EL GRIMORIO DE ${nombreUsuario}</h2>
@@ -149,7 +132,7 @@ function salirDeCarpeta() {
 
 async function guardarEnCarpeta(id) {
     if (!usuarioActual) {
-        mostrarNotificacion("¡Debes entrar con tu cuenta!", "❌");
+        mostrarNotificacion("¡Debes entrar con tu cuenta para guardar!", "❌");
         return;
     }
     const docRef = db.collection('carpetas').doc(usuarioActual.uid);
@@ -169,45 +152,47 @@ async function guardarEnCarpeta(id) {
     } catch (e) { console.error(e); }
 }
 
-// 8. AUTENTICACIÓN
+// AUTH
 auth.onAuthStateChanged(user => {
     usuarioActual = user;
     document.getElementById('btn-login').style.display = user ? 'none' : 'block';
     document.getElementById('user-logged').style.display = user ? 'flex' : 'none';
     if(user) {
         const photo = document.getElementById('user-photo');
-        if(photo) {
-            photo.src = user.photoURL;
-            photo.referrerPolicy = "no-referrer";
-        }
+        photo.src = user.photoURL;
+        photo.referrerPolicy = "no-referrer";
     }
 });
 
-// 9. LISTENERS Y BOTONES (VERSIÓN BLINDADA)
 document.getElementById('btn-login').onclick = () => {
-    // Intentamos obtener el proveedor directamente del objeto auth de firebase
-    try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+};
+document.getElementById('btn-logout').onclick = () => auth.signOut();
+document.getElementById('close-detail').onclick = () => panel.classList.remove('active');
 
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                mostrarNotificacion("¡Bienvenido al Reino, " + result.user.displayName + "!", "⚔️");
-            })
-            .catch((error) => {
-                console.error("Error en login:", error);
-                // Si el navegador bloquea el popup, usamos redirección
-                if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
-                    auth.signInWithRedirect(provider);
-                }
-            });
-    } catch (e) {
-        console.error("Error al inicializar el proveedor:", e);
-        mostrarNotificacion("Error técnico: Revisa la conexión con Firebase", "❌");
-    }
+// LISTENERS
+buscador.addEventListener('input', filtrarCartas);
+document.getElementById('raza-filter').addEventListener('change', filtrarCartas);
+document.querySelectorAll('input[type="checkbox"]').forEach(i => i.addEventListener('change', filtrarCartas));
+document.getElementById('filter-coste').oninput = (e) => {
+    document.getElementById('val-coste').innerText = e.target.value;
+    filtrarCartas();
+};
+document.getElementById('filter-fuerza').oninput = (e) => {
+    document.getElementById('val-fuerza').innerText = e.target.value;
+    filtrarCartas();
 };
 
-// 10. NOTIFICACIONES (TOAST)
+function cartaAlAzar() {
+    if (cartasMyL.length === 0) return;
+    const c = cartasMyL[Math.floor(Math.random() * cartasMyL.length)];
+    mostrarDetalle(c, `img/cartas/${c.Bloque}/${c.Carpeta_Edicion}/${c.Imagen}`);
+}
+
+cargarGrimorio();
+
+// --- FUNCIÓN PARA MOSTRAR NOTIFICACIONES BONITAS (TOAST) ---
 function mostrarNotificacion(mensaje, icono = '📖') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -232,6 +217,3 @@ function mostrarNotificacion(mensaje, icono = '📖') {
         }, 500);
     }, 4000);
 }
-
-// Iniciar carga
-cargarGrimorio();
