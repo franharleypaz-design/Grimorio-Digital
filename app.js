@@ -142,43 +142,60 @@ async function guardarEnCarpeta(id) {
     } catch (e) { console.error(e); }
 }
 
-// 8. AUTENTICACIÓN (Sincronización de interfaz)
+// 8. AUTENTICACIÓN (Sincronización de interfaz y bienvenida automática)
 auth.onAuthStateChanged(user => {
-    usuarioActual = user;
-    document.getElementById('btn-login').style.display = user ? 'none' : 'block';
-    document.getElementById('user-logged').style.display = user ? 'flex' : 'none';
-    if(user) {
+    const loginBtn = document.getElementById('btn-login');
+    const userSection = document.getElementById('user-logged');
+    
+    if (user) {
+        // Notificación de bienvenida si es un cambio de estado a logueado
+        if (!usuarioActual) {
+            const nombre = user.displayName ? user.displayName.split(' ')[0] : "Gladiador";
+            // Timeout para asegurar que el DOM y el toast-container estén listos en servidores remotos
+            setTimeout(() => {
+                mostrarNotificacion(`¡Bienvenido al Reino, ${nombre}!`, "⚔️");
+            }, 1000);
+        }
+        
+        usuarioActual = user;
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(userSection) userSection.style.display = 'flex';
+        
         const photo = document.getElementById('user-photo');
-        photo.src = user.photoURL;
-        photo.referrerPolicy = "no-referrer";
+        if(photo) {
+            photo.src = user.photoURL;
+            photo.referrerPolicy = "no-referrer";
+        }
+    } else {
+        // Notificación de salida
+        if (usuarioActual) {
+            mostrarNotificacion("Has abandonado el Reino...", "🌙");
+        }
+        usuarioActual = null;
+        if(loginBtn) loginBtn.style.display = 'block';
+        if(userSection) userSection.style.display = 'none';
+        modoCarpeta = false;
+        salirDeCarpeta();
     }
 });
 
-// 9. EVENTO DE LOGIN (¡Aquí está la bienvenida!)
+// 9. EVENTO DE LOGIN
 document.getElementById('btn-login').onclick = () => {
     if (typeof firebase !== 'undefined' && firebase.auth) {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
         
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                // MENSAJE DE BIENVENIDA AL ENTRAR
-                const nombre = result.user.displayName ? result.user.displayName.split(' ')[0] : "Gladiador";
-                mostrarNotificacion(`¡Bienvenido al Reino, ${nombre}!`, "⚔️");
-            })
-            .catch((error) => {
-                console.error("Error en login:", error);
-                if (error.code === 'auth/popup-blocked') {
-                    auth.signInWithRedirect(provider);
-                }
-            });
+        auth.signInWithPopup(provider).catch((error) => {
+            console.error("Error en login:", error);
+            if (error.code === 'auth/popup-blocked') {
+                auth.signInWithRedirect(provider);
+            }
+        });
     }
 };
 
 document.getElementById('btn-logout').onclick = () => {
-    auth.signOut().then(() => {
-        mostrarNotificacion("Has abandonado el Reino...", "🌙");
-    });
+    auth.signOut();
 };
 
 document.getElementById('close-detail').onclick = () => panel.classList.remove('active');
