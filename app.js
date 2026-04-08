@@ -268,3 +268,39 @@ function mostrarNotificacion(mensaje, icono = '📖') {
 
 // Inicializar
 cargarGrimorio();
+
+
+// --- CÓDIGO DE RASTREO DE EMERGENCIA ---
+async function generarReporteFaltantes() {
+    // Esperamos 3 segundos para asegurar que el JSON cargó
+    setTimeout(() => {
+        if (cartasMyL.length === 0) {
+            alert("El Grimorio está vacío. Revisa la carga del JSON.");
+            return;
+        }
+
+        let idsPresentes = cartasMyL.map(c => {
+            let num = c.ID.match(/\d+/); 
+            return num ? parseInt(num[0]) : null;
+        }).filter(n => n !== null);
+
+        let faltantes = [];
+        for(let i=1; i <= 236; i++) {
+            if(!idsPresentes.includes(i)) {
+                faltantes.push("ES-" + i.toString().padStart(3, '0'));
+            }
+        }
+
+        // Creamos un mensaje para mostrar en pantalla
+        let mensaje = "--- REPORTE DEL REINO ---\n\n";
+        mensaje += "Cartas detectadas: " + cartasMyL.length + "\n";
+        mensaje += "IDs faltantes: " + (faltantes.length > 0 ? faltantes.join(", ") : "¡Ninguno!") + "\n\n";
+        mensaje += "Revisa si estos IDs están mal escritos en el Excel.";
+
+        console.log(mensaje);
+        alert(mensaje); // Esto hará que salte una ventana en tu navegador
+    }, 3000); 
+}
+
+// Ejecutar el reporte
+generarReporteFaltantes();
