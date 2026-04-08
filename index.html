@@ -22,6 +22,7 @@
         <div class="header-action-block">
             <div class="search-container">
                 <input type="text" id="main-search" placeholder="Buscar por nombre, tipo, raza, habilidad...">
+                <button class="btn-random" onclick="cartaAlAzar()" style="background:var(--accent); border:none; padding:0 15px; border-radius:6px; font-size:1.2rem; cursor:pointer; margin-right:5px;">🎲</button>
                 <button class="btn-advanced">Avanzada</button>
             </div>
         </div>
@@ -49,12 +50,30 @@
             </section>
 
             <section class="filter-group">
+                <h3>ESTADÍSTICAS</h3>
+                <div style="margin-bottom:15px;">
+                    <label style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--accent);">
+                        Coste Máx: <span id="val-coste">5</span>
+                    </label>
+                    <input type="range" id="filter-coste" min="0" max="5" value="5" style="width:100%; accent-color:var(--accent);">
+                </div>
+                <div>
+                    <label style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--accent);">
+                        Fuerza Mín: <span id="val-fuerza">0</span>
+                    </label>
+                    <input type="range" id="filter-fuerza" min="0" max="5" value="0" style="width:100%; accent-color:var(--accent);">
+                </div>
+            </section>
+
+            <section class="filter-group">
                 <h3>RAZAS</h3>
                 <select id="raza-filter">
                     <option value="">Todas las razas</option>
                     <option value="caballero">Caballero</option>
                     <option value="dragon">Dragón</option>
                     <option value="guerrero">Guerrero</option>
+                    <option value="sombra">Sombra</option>
+                    <option value="ancestral">Ancestral</option>
                 </select>
             </section>
         </aside>
