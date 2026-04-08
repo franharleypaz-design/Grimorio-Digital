@@ -151,15 +151,37 @@ async function guardarEnCarpeta(id) {
     } catch (e) { console.error(e); }
 }
 
-// AUTH
+// 8. AUTH (CON MENSAJE DE BIENVENIDA RESTAURADO)
 auth.onAuthStateChanged(user => {
-    usuarioActual = user;
-    document.getElementById('btn-login').style.display = user ? 'none' : 'block';
-    document.getElementById('user-logged').style.display = user ? 'flex' : 'none';
-    if(user) {
+    const loginBtn = document.getElementById('btn-login');
+    const userSection = document.getElementById('user-logged');
+    
+    if (user) {
+        // Si el usuario acaba de iniciar sesión y no lo habíamos saludado
+        if (!usuarioActual) {
+            const nombre = user.displayName ? user.displayName.split(' ')[0] : "Gladiador";
+            mostrarNotificacion(`¡Bienvenido al Reino, ${nombre}!`, "⚔️");
+        }
+        
+        usuarioActual = user;
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(userSection) userSection.style.display = 'flex';
+        
         const photo = document.getElementById('user-photo');
-        photo.src = user.photoURL;
-        photo.referrerPolicy = "no-referrer";
+        if(photo) {
+            photo.src = user.photoURL;
+            photo.referrerPolicy = "no-referrer";
+        }
+    } else {
+        // Si el usuario cierra sesión
+        if (usuarioActual) {
+            mostrarNotificacion("Has abandonado el Reino...", "🌙");
+        }
+        usuarioActual = null;
+        if(loginBtn) loginBtn.style.display = 'block';
+        if(userSection) userSection.style.display = 'none';
+        modoCarpeta = false;
+        salirDeCarpeta(); // Nos asegura que vuelva al inicio
     }
 });
 
