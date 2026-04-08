@@ -12,7 +12,8 @@
     "Ilustrador": "Mauricio Herrera",
     "Bloque": "primer_bloque",
     "Carpeta_Edicion": "Espada_Sagrada",
-    "Imagen": "ES-001.jpg"
+    "Imagen": "ES-001.jpg",
+    "Relacionadas": "ES-112"
   },
   {
     "ID": "ES-112",
@@ -27,7 +28,8 @@
     "Ilustrador": "Juan Vásquez",
     "Bloque": "primer_bloque",
     "Carpeta_Edicion": "Espada_Sagrada",
-    "Imagen": "ES-112.jpg"
+    "Imagen": "ES-112.jpg",
+    "Relacionadas": "ES-001"
   },
   {
     "ID": "ES-023",
@@ -42,7 +44,8 @@
     "Ilustrador": "Waldo Retamales",
     "Bloque": "primer_bloque",
     "Carpeta_Edicion": "Espada_Sagrada",
-    "Imagen": "ES-023.jpg"
+    "Imagen": "ES-023.jpg",
+    "Relacionadas": ""
   },
   {
     "ID": "HE-045",
@@ -57,7 +60,8 @@
     "Ilustrador": "Juan Vásquez",
     "Bloque": "primer_bloque",
     "Carpeta_Edicion": "Helenica",
-    "Imagen": "HE-045.jpg"
+    "Imagen": "HE-045.jpg",
+    "Relacionadas": ""
   },
   {
     "ID": "RG-010",
@@ -72,6 +76,7 @@
     "Ilustrador": "Mauricio Herrera",
     "Bloque": "primera_era",
     "Carpeta_Edicion": "Ragnarok",
-    "Imagen": "RG-010.jpg"
+    "Imagen": "RG-010.jpg",
+    "Relacionadas": ""
   }
 ]
