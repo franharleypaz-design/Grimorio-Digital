@@ -1,4 +1,5 @@
-[
+{
+    "Carga Masiva de Cartas Excel a ": [
         {
             "ID": "ES-001",
             "Nombre": "Rey Arturo Pendragón",
@@ -3267,4 +3268,5 @@
             "Carpeta_Edicion": "Espada_Sagrada",
             "Imagen": "ES-236.jpg"
         }
-]
+    ]
+}
