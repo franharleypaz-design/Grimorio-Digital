@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* --- CORRECCIÓN DE SCROLL GLOBAL --- */
+        html, body.body-grimorio {
+            height: auto !important; /* Permite que el contenido defina la altura */
+            min-height: 100vh;
+            overflow-y: auto !important; /* Habilita scroll vertical */
+            overflow-x: hidden;
+            display: block; /* Desactiva posibles restricciones de flexbox/grid del body */
+        }
+
+        .content-grimorio {
+            overflow: visible !important; /* Asegura que el contenedor no corte el contenido */
+            padding-bottom: 80px; /* Espacio de seguridad al final */
+        }
+
         /* ESTILOS PARA MAZOS Y CARPETAS */
         .seccion-gestion {
             display: grid;
@@ -42,6 +56,17 @@
             margin-top: 15px;
         }
 
+        /* REJILLA ESPECÍFICA PARA MAZOS ADQUIRIDOS */
+        #grid-mazos-copiados {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 10px;
+            /* Quitamos max-height para que la página crezca naturalmente */
+            max-height: none !important; 
+            overflow: visible !important;
+        }
+
         .slot-item {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid #333;
@@ -56,6 +81,11 @@
         .slot-item:hover {
             border-color: var(--accent);
             background: rgba(212, 175, 55, 0.05);
+        }
+
+        .item-copiado {
+            min-height: 80px;
+            border-left: 4px solid #3b82f6;
         }
 
         .slot-info {
@@ -105,12 +135,6 @@
             background: #8b1a1a;
             color: white;
             border-color: #ff4444;
-        }
-
-        .btn-share:hover {
-            background: #2a5298 !important;
-            color: white !important;
-            border-color: #3b82f6 !important;
         }
 
         .btn-slot-open {
@@ -177,6 +201,9 @@
             .seccion-gestion {
                 grid-template-columns: 1fr;
             }
+            #grid-mazos-copiados {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -230,10 +257,10 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon btn-share" onclick="copiarIDAlPortapapeles('mazo1')" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo1', this)" title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('mazo1')" title="Renombrar">✏️</button>
                             <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo1')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="location.href='constructor.html?slot=mazo1'">GESTIONAR</button>
+                            <button class="btn-slot-open" onclick="irAConstructor('mazo1')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="mazo2">
@@ -242,10 +269,10 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon btn-share" onclick="copiarIDAlPortapapeles('mazo2')" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo2', this)" title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('mazo2')" title="Renombrar">✏️</button>
                             <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo2')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="location.href='constructor.html?slot=mazo2'">GESTIONAR</button>
+                            <button class="btn-slot-open" onclick="irAConstructor('mazo2')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="mazo3">
@@ -254,16 +281,16 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon btn-share" onclick="copiarIDAlPortapapeles('mazo3')" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo3', this)" title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('mazo3')" title="Renombrar">✏️</button>
                             <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo3')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="location.href='constructor.html?slot=mazo3'">GESTIONAR</button>
+                            <button class="btn-slot-open" onclick="irAConstructor('mazo3')">GESTIONAR</button>
                         </div>
                     </div>
                 </div>
                 <div class="import-box">
                     <input type="text" id="input-copiar-id" placeholder="Pegar ID de mazo ajeno...">
-                    <button class="btn-slot-open" id="btn-copiar-id" style="background:#fff">COPIAR</button>
+                    <button class="btn-slot-open" id="btn-copiar-id" style="background:#fff; color:#000">COPIAR</button>
                 </div>
             </div>
 
@@ -276,10 +303,10 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon btn-share" onclick="copiarIDAlPortapapeles('carpeta1')" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta1', this)" title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('carpeta1')" title="Renombrar">✏️</button>
                             <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta1')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="location.href='constructor.html?slot=carpeta1'">GESTIONAR</button>
+                            <button class="btn-slot-open" onclick="irAConstructor('carpeta1')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="carpeta2">
@@ -288,10 +315,10 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon btn-share" onclick="copiarIDAlPortapapeles('carpeta2')" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta2', this)" title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('carpeta2')" title="Renombrar">✏️</button>
                             <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta2')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="location.href='constructor.html?slot=carpeta2'">GESTIONAR</button>
+                            <button class="btn-slot-open" onclick="irAConstructor('carpeta2')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="carpeta3">
@@ -300,10 +327,10 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon btn-share" onclick="copiarIDAlPortapapeles('carpeta3')" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta3', this)" title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('carpeta3')" title="Renombrar">✏️</button>
                             <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta3')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="location.href='constructor.html?slot=carpeta3'">GESTIONAR</button>
+                            <button class="btn-slot-open" onclick="irAConstructor('carpeta3')">GESTIONAR</button>
                         </div>
                     </div>
                 </div>
@@ -313,9 +340,9 @@
             </div>
         </section>
 
-        <section class="bloque-místico" id="seccion-copias" style="margin-top: 20px; display: none; grid-column: 1 / -1;">
-            <h3>✨ MAZOS ADQUIRIDOS</h3>
-            <div class="grid-slots" id="grid-mazos-copiados">
+        <section id="seccion-copias" class="bloque-místico" style="margin-top: 20px; display: none;">
+            <h3>✨ MAZOS ADQUIRIDOS <span>(MÁX 6)</span></h3>
+            <div id="grid-mazos-copiados">
                 </div>
         </section>
 

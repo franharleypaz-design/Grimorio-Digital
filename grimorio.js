@@ -53,8 +53,9 @@ function inyectarSlotCopiado(id, data) {
     if (!grid) return;
     const total = data.cartas ? data.cartas.reduce((acc, item) => acc + item.cant, 0) : 0;
     const div = document.createElement('div');
-    div.className = 'slot-item'; 
-    div.style.borderLeft = "4px solid #3b82f6"; 
+    
+    // Unificamos clase para que use el estilo de los mazos originales
+    div.className = 'slot-item item-copiado'; 
     div.innerHTML = `
         <div class="slot-info">
             <span class="slot-name" style="color:#3b82f6">${data.nombre.toUpperCase()}</span>
@@ -68,7 +69,7 @@ function inyectarSlotCopiado(id, data) {
     grid.appendChild(div);
 }
 
-// 2. ACCIÓN: COMPARTIR (CORREGIDO PARA GITHUB/HTTPS)
+// 2. ACCIÓN: COMPARTIR
 function copiarIDAlPortapapeles(id, el) {
     if (!usuarioActual) return;
     
@@ -77,7 +78,6 @@ function copiarIDAlPortapapeles(id, el) {
     const num = id.match(/\d+/) || "1";
     const selloBonito = `${prefijo}-${tipo}${num}`;
 
-    // Intento con API moderna
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(selloBonito).then(() => {
             ejecutarFeedbackCopiado(el, selloBonito);
@@ -86,12 +86,10 @@ function copiarIDAlPortapapeles(id, el) {
             copiarMetodoFallback(selloBonito, el);
         });
     } else {
-        // Fallback para navegadores que bloquean navigator.clipboard
         copiarMetodoFallback(selloBonito, el);
     }
 }
 
-// Función de respaldo para asegurar el copiado en Git
 function copiarMetodoFallback(texto, el) {
     const textArea = document.createElement("textarea");
     textArea.value = texto;
@@ -122,7 +120,7 @@ function ejecutarFeedbackCopiado(el, sello) {
     setTimeout(() => { el.innerText = iconoOriginal; }, 2000);
 }
 
-// 3. ACCIÓN: IMPORTAR (CON VALIDACIÓN DE AUTOCRIADO)
+// 3. ACCIÓN: IMPORTAR (CON LÍMITE DE 6)
 async function copiarMazoPorID() {
     const input = document.getElementById('input-copiar-id');
     const btn = document.getElementById('btn-copiar-id'); 
@@ -143,6 +141,17 @@ async function copiarMazoPorID() {
     }
 
     try {
+        // --- VALIDACIÓN DE LÍMITE DE 6 MAZOS ADQUIRIDOS ---
+        const slotsRef = db.collection('usuarios').doc(usuarioActual.uid).collection('slots');
+        const querySnapshot = await slotsRef.get();
+        let totalCopias = 0;
+        querySnapshot.forEach(doc => { if (doc.id.startsWith('copia_')) totalCopias++; });
+
+        if (totalCopias >= 6) {
+            mostrarNotificacion("Límite alcanzado (máx 6 estrategias).", "🚫");
+            return;
+        }
+
         mostrarNotificacion("Buscando Sello en el Reino...", "⏳");
         const idBuscado = codigoMazo.replace('M', 'mazo').replace('C', 'carpeta').toLowerCase();
 

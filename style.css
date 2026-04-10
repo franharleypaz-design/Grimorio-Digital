@@ -979,3 +979,55 @@ a { text-decoration: none; color: inherit; }
     font-size: 0.8rem;
     color: #fff;
 }
+
+/* Contenedor de mazos adquiridos en 2 columnas */
+#grid-mazos-copiados {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 15px;
+    padding: 10px;
+    max-height: 400px; /* Altura máxima para no romper la página */
+    overflow-y: auto;  /* Scroll si hay muchos */
+}
+
+/* Ajuste para que los items no se vean gigantes */
+.item-copiado {
+    min-height: 80px;
+    margin-bottom: 0 !important; /* El gap del grid maneja el espacio */
+}
+
+/* Scrollbar mística para el panel de copias */
+#grid-mazos-copiados::-webkit-scrollbar { width: 5px; }
+#grid-mazos-copiados::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+/* Responsive: 1 columna en celulares */
+@media (max-width: 768px) {
+    #grid-mazos-copiados {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Asegurar que la página del grimorio permita scroll */
+.body-grimorio {
+    height: auto !important; /* Permite que la altura sea dinámica */
+    min-height: 100vh;
+    overflow-y: auto !important; /* Fuerza la aparición del scroll vertical */
+    display: block; /* Evita conflictos con flexbox si estaba activado */
+}
+
+/* El contenedor principal también debe permitir scroll */
+.content-grimorio {
+    overflow: visible !important;
+    padding-bottom: 50px; /* Espacio extra al final para que no choque con el borde */
+}
+
+/* Ajuste para el grid de mazos adquiridos */
+#grid-mazos-copiados {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    /* Quitamos el max-height si quieres que se vea todo estirado, 
+       o lo dejamos con scroll interno si prefieres mantener el orden */
+    max-height: none !important; 
+    overflow: visible !important;
+}
