@@ -68,7 +68,7 @@ function inyectarSlotCopiado(id, data) {
     grid.appendChild(div);
 }
 
-// 2. ACCIÓN: COMPARTIR (CREA EL SELLO CORTO: 9XKG-M1)
+// 2. ACCIÓN: COMPARTIR (CORREGIDO PARA GITHUB/HTTPS)
 function copiarIDAlPortapapeles(id, el) {
     if (!usuarioActual) return;
     
@@ -77,12 +77,49 @@ function copiarIDAlPortapapeles(id, el) {
     const num = id.match(/\d+/) || "1";
     const selloBonito = `${prefijo}-${tipo}${num}`;
 
-    navigator.clipboard.writeText(selloBonito).then(() => {
-        mostrarNotificacion(`📜 SELLO [${selloBonito}] COPIADO`, "✨");
-        const iconoOriginal = el.innerText;
-        el.innerText = "✅";
-        setTimeout(() => { el.innerText = iconoOriginal; }, 2000);
-    });
+    // Intento con API moderna
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(selloBonito).then(() => {
+            ejecutarFeedbackCopiado(el, selloBonito);
+        }).catch(err => {
+            console.warn("Falla Clipboard API, usando fallback...");
+            copiarMetodoFallback(selloBonito, el);
+        });
+    } else {
+        // Fallback para navegadores que bloquean navigator.clipboard
+        copiarMetodoFallback(selloBonito, el);
+    }
+}
+
+// Función de respaldo para asegurar el copiado en Git
+function copiarMetodoFallback(texto, el) {
+    const textArea = document.createElement("textarea");
+    textArea.value = texto;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            ejecutarFeedbackCopiado(el, texto);
+        } else {
+            alert("No se pudo copiar el sello: " + texto);
+        }
+    } catch (err) {
+        console.error("Error en fallback:", err);
+    }
+    document.body.removeChild(textArea);
+}
+
+function ejecutarFeedbackCopiado(el, sello) {
+    mostrarNotificacion(`📜 SELLO [${sello}] COPIADO`, "✨");
+    const iconoOriginal = el.innerText;
+    el.innerText = "✅";
+    setTimeout(() => { el.innerText = iconoOriginal; }, 2000);
 }
 
 // 3. ACCIÓN: IMPORTAR (CON VALIDACIÓN DE AUTOCRIADO)
@@ -96,7 +133,6 @@ async function copiarMazoPorID() {
         return;
     }
 
-    // --- PROTECCIÓN: VALIDAR SI ES TU PROPIO SELLO ---
     const miPrefijo = usuarioActual.uid.substring(0, 4).toUpperCase();
     const [prefijoAmigo, codigoMazo] = sello.split('-');
 
@@ -108,10 +144,8 @@ async function copiarMazoPorID() {
 
     try {
         mostrarNotificacion("Buscando Sello en el Reino...", "⏳");
-
         const idBuscado = codigoMazo.replace('M', 'mazo').replace('C', 'carpeta').toLowerCase();
 
-        // BUSCAMOS AL USUARIO
         const usuariosRef = db.collection('usuarios');
         const snapshot = await usuariosRef.get();
         
