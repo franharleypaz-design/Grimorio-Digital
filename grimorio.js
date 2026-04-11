@@ -1,6 +1,8 @@
 // ==========================================
-// GRIMORIO.JS - SISTEMA DE SELLOS MÍSTICOS (PROTEGIDO)
+// GRIMORIO.JS - SISTEMA DE SELLOS MÍSTICOS (MODAL Y LÍMITE INCLUIDO)
 // ==========================================
+
+let slotParaRenombrar = null; // Variable temporal para el modal
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -39,32 +41,87 @@ async function cargarSlotsSantuario() {
 function actualizarVisualSlot(id, data) {
     const contenedor = document.querySelector(`[data-slot-id="${id}"]`);
     if (!contenedor) return;
+    
     const nombreTxt = contenedor.querySelector('.slot-name');
     if (nombreTxt) nombreTxt.innerText = (data.nombre || getDefaultName(id)).toUpperCase();
+    
     const contadorTxt = contenedor.querySelector('.slot-count');
     if (contadorTxt) {
-        const total = data.cartas ? data.cartas.reduce((acc, item) => acc + item.cant, 0) : 0;
-        contadorTxt.innerText = `${total} CARTAS`;
+        const cartas = data.cartas || [];
+        let totalMazoLegal = 0;
+
+        cartas.forEach(item => {
+            if (typeof cartasMyL !== 'undefined') {
+                const infoC = cartasMyL.find(c => c.ID === item.id);
+                const esOroInicial = infoC && infoC.Tipo.includes('Oro') && (!infoC.Habilidad || infoC.Habilidad.length < 5);
+                if (!esOroInicial) totalMazoLegal += item.cant;
+            } else {
+                totalMazoLegal += item.cant;
+            }
+        });
+
+        contadorTxt.innerText = `${totalMazoLegal} CARTAS`;
+
+        if (id.includes('mazo')) {
+            if (totalMazoLegal > 50) {
+                contadorTxt.style.color = "#ff4444"; 
+                contadorTxt.innerText += " (EXCEDIDO)";
+                contadorTxt.style.textShadow = "0 0 8px rgba(255, 68, 68, 0.4)";
+            } else if (totalMazoLegal === 50) {
+                contadorTxt.style.color = "#00ff00"; 
+                contadorTxt.style.textShadow = "0 0 8px rgba(0, 255, 0, 0.4)";
+            } else {
+                contadorTxt.style.color = "var(--accent)"; 
+                contadorTxt.style.textShadow = "none";
+            }
+        }
     }
 }
 
 function inyectarSlotCopiado(id, data) {
     const grid = document.getElementById('grid-mazos-copiados');
     if (!grid) return;
-    const total = data.cartas ? data.cartas.reduce((acc, item) => acc + item.cant, 0) : 0;
-    const div = document.createElement('div');
     
-    // Unificamos clase para que use el estilo de los mazos originales
+    const cartas = data.cartas || [];
+    let totalMazoLegal = 0;
+    cartas.forEach(item => {
+        if (typeof cartasMyL !== 'undefined') {
+            const infoC = cartasMyL.find(c => c.ID === item.id);
+            const esOroInicial = infoC && infoC.Tipo.includes('Oro') && (!infoC.Habilidad || infoC.Habilidad.length < 5);
+            if (!esOroInicial) totalMazoLegal += item.cant;
+        } else {
+            totalMazoLegal += item.cant;
+        }
+    });
+    
+    let colorContador = "var(--accent)";
+    let msgExtra = "";
+    let shadow = "none";
+
+    if (totalMazoLegal > 50) {
+        colorContador = "#ff4444";
+        msgExtra = " (EXCEDIDO)";
+        shadow = "0 0 8px rgba(255, 68, 68, 0.4)";
+    } else if (totalMazoLegal === 50) {
+        colorContador = "#00ff00";
+        shadow = "0 0 8px rgba(0, 255, 0, 0.4)";
+    }
+
+    const nombreLimpio = data.nombre.replace("COPIA:", "").trim();
+
+    const div = document.createElement('div');
     div.className = 'slot-item item-copiado'; 
     div.innerHTML = `
         <div class="slot-info">
-            <span class="slot-name" style="color:#3b82f6">${data.nombre.toUpperCase()}</span>
-            <span class="slot-count">${total} CARTAS</span>
+            <span class="slot-name" style="color:#ffffff !important;">
+                <strong style="color:var(--accent); font-size:0.7rem;">COPIA:</strong> ${nombreLimpio.toUpperCase()}
+            </span>
+            <span class="slot-count" style="color:${colorContador}; text-shadow:${shadow}">${totalMazoLegal} CARTAS${msgExtra}</span>
         </div>
         <div class="slot-controls">
             <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('${id}', this)" title="Re-compartir Sello">🔗</button>
             <button class="btn-slot-icon btn-del" onclick="borrarCopia('${id}')" title="Desterrar">🗑️</button>
-            <button class="btn-slot-open" onclick="irAConstructor('${id}')">GESTIONAR</button>
+            <button class="btn-slot-open" onclick="navegarAGestion('${id}')">GESTIONAR</button>
         </div>`;
     grid.appendChild(div);
 }
@@ -74,15 +131,16 @@ function copiarIDAlPortapapeles(id, el) {
     if (!usuarioActual) return;
     
     const prefijo = usuarioActual.uid.substring(0, 4).toUpperCase();
-    const tipo = id.includes('mazo') ? 'M' : 'C';
-    const num = id.match(/\d+/) || "1";
+    let tipo = id.includes('mazo') ? 'M' : 'C';
+    if (id.startsWith('copia_')) tipo = 'M';
+
+    const num = id.match(/\d+/) || "X";
     const selloBonito = `${prefijo}-${tipo}${num}`;
 
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(selloBonito).then(() => {
             ejecutarFeedbackCopiado(el, selloBonito);
         }).catch(err => {
-            console.warn("Falla Clipboard API, usando fallback...");
             copiarMetodoFallback(selloBonito, el);
         });
     } else {
@@ -104,8 +162,6 @@ function copiarMetodoFallback(texto, el) {
         const successful = document.execCommand('copy');
         if (successful) {
             ejecutarFeedbackCopiado(el, texto);
-        } else {
-            alert("No se pudo copiar el sello: " + texto);
         }
     } catch (err) {
         console.error("Error en fallback:", err);
@@ -120,7 +176,7 @@ function ejecutarFeedbackCopiado(el, sello) {
     setTimeout(() => { el.innerText = iconoOriginal; }, 2000);
 }
 
-// 3. ACCIÓN: IMPORTAR (CON LÍMITE DE 6)
+// 3. ACCIÓN: IMPORTAR
 async function copiarMazoPorID() {
     const input = document.getElementById('input-copiar-id');
     const btn = document.getElementById('btn-copiar-id'); 
@@ -141,7 +197,6 @@ async function copiarMazoPorID() {
     }
 
     try {
-        // --- VALIDACIÓN DE LÍMITE DE 6 MAZOS ADQUIRIDOS ---
         const slotsRef = db.collection('usuarios').doc(usuarioActual.uid).collection('slots');
         const querySnapshot = await slotsRef.get();
         let totalCopias = 0;
@@ -171,7 +226,7 @@ async function copiarMazoPorID() {
         }
 
         const docAjeno = await db.collection('usuarios').doc(uidEncontrado)
-                                 .collection('slots').doc(idBuscado).get();
+                                     .collection('slots').doc(idBuscado).get();
 
         if (!docAjeno.exists) {
             mostrarNotificacion("El mazo se ha desvanecido.", "❌");
@@ -206,23 +261,61 @@ async function copiarMazoPorID() {
     }
 }
 
+// 4. LÓGICA DE RENOMBRADO (MODAL PERSONALIZADO)
+function renombrarSlot(id) {
+    slotParaRenombrar = id;
+    const modal = document.getElementById('modal-renombrar');
+    const input = document.getElementById('input-nuevo-nombre');
+    
+    const contenedor = document.querySelector(`[data-slot-id="${id}"]`);
+    const nombreActual = contenedor ? contenedor.querySelector('.slot-name').innerText : "";
+    
+    input.value = nombreActual;
+    modal.style.display = 'flex'; 
+    input.focus();
+
+    document.getElementById('btn-confirmar-nombre').onclick = ejecutarRenombrado;
+}
+
+function cerrarModalRenombrar() {
+    document.getElementById('modal-renombrar').style.display = 'none';
+    slotParaRenombrar = null;
+}
+
+async function ejecutarRenombrado() {
+    const nuevoNombre = document.getElementById('input-nuevo-nombre').value.trim().toUpperCase();
+    
+    if (!nuevoNombre) {
+        mostrarNotificacion("El nombre no puede estar vacío", "⚠️");
+        return;
+    }
+
+    if (nuevoNombre.length > 35) {
+        mostrarNotificacion("Máximo 35 caracteres", "⚠️");
+        return;
+    }
+
+    try {
+        await db.collection('usuarios').doc(usuarioActual.uid)
+                .collection('slots').doc(slotParaRenombrar).set({
+            nombre: nuevoNombre
+        }, { merge: true });
+
+        mostrarNotificacion("REGISTRO ACTUALIZADO", "📜");
+        cerrarModalRenombrar();
+        cargarSlotsSantuario(); 
+    } catch (e) {
+        console.error("Error al renombrar:", e);
+        mostrarNotificacion("Error astral al renombrar", "❌");
+    }
+}
+
 // GESTIÓN
 async function borrarCopia(id) {
     if (!confirm("¿Desterrar mazo?")) return;
     try {
         await db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(id).delete();
         mostrarNotificacion("Mazo desterrado.", "🗑️");
-        cargarSlotsSantuario();
-    } catch (e) { console.error(e); }
-}
-
-async function renombrarSlot(id) {
-    const nuevo = prompt("Nuevo nombre:");
-    if (!nuevo) return;
-    try {
-        await db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(id).set({
-            nombre: nuevo.toUpperCase()
-        }, { merge: true });
         cargarSlotsSantuario();
     } catch (e) { console.error(e); }
 }
@@ -242,4 +335,10 @@ function getDefaultName(id) {
     return nombres[id] || "REGISTRO";
 }
 
-function irAConstructor(id) { window.location.href = `constructor.html?slot=${id}`; }
+function navegarAGestion(slotId) {
+    if (slotId.includes('mazo') || slotId.startsWith('copia_')) {
+        window.location.href = `constructor.html?slot=${slotId}`;
+    } else {
+        window.location.href = `album.html?slot=${slotId}`;
+    }
+}

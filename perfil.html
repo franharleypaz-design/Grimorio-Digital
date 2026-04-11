@@ -37,7 +37,7 @@
             cursor: pointer;
             text-transform: uppercase;
             border-radius: 4px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 5px rgba(255,255,255,0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 0 5px rgba(255, 255, 255, 0.5);
             transition: 0.3s;
             letter-spacing: 1px;
             width: 100%;
@@ -84,8 +84,18 @@
             transition: 0.3s;
             margin: 0 auto 20px auto;
         }
-        .avatar-container-large:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--accent); }
-        #profile-img-large { width: 100%; height: 100%; object-fit: cover; }
+
+        .avatar-container-large:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--accent);
+        }
+
+        #profile-img-large {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .change-photo-overlay {
             position: absolute;
             bottom: 0;
@@ -100,58 +110,63 @@
             opacity: 0;
             transition: 0.3s;
         }
-        .avatar-container-large:hover .change-photo-overlay { opacity: 1; }
+
+        .avatar-container-large:hover .change-photo-overlay {
+            opacity: 1;
+        }
     </style>
 </head>
 
 <body class="body-perfil">
-
     <header class="main-header">
         <div class="header-identity-block">
-            <div class="logo-container" onclick="location.href='index.html'" style="cursor:pointer;">
-                <img src="logo-fenix.png" alt="Fénix MyL" class="main-logo">
+            <div class="logo-container" onclick="location.href='grimorio.html'" style="cursor:pointer;">
+                <img src="img/logo-Grimorio-digital.png" alt="Grimorio Digital" class="main-logo">
                 <div class="logo-text">
-                    <h1>GRIMORIO DE <span class="accent-on-light">MITOLOGÍA</span></h1>
-                    <p class="subtitle">PRIMERA ERA Y PRIMER BLOQUE</p>
+                    <h1>GRIMORIO <span class="accent-on-light">DIGITAL</span></h1>
+                    <p class="subtitle">SANTUARIO DE ESTRATEGIA</p>
                 </div>
             </div>
         </div>
 
         <div class="header-action-block">
-            <button id="btn-login">ASCENDER</button>
-            <div id="user-logged" style="display: none;">
+            <div id="user-logged">
                 <span id="display-name-text"></span>
                 <img id="user-photo" class="avatar-header" src="img/avatar-default.png"
-                    onclick="location.href='perfil.html'" title="Mi Perfil" style="cursor: pointer;">
+                    onclick="location.href='perfil.html'">
                 <button id="btn-logout" class="btn-salir">SALIR</button>
             </div>
         </div>
     </header>
-
     <main class="perfil-main">
         <div class="perfil-card">
             <div id="perfil-view-wrapper">
-                
-                <div class="invocador-column" style="flex: 1; padding-right: 40px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center;">
-                    <div id="invocador-view" class="view-block" style="display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; justify-content: center;">
-                        
+
+                <div class="invocador-column"
+                    style="flex: 1; padding-right: 40px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center;">
+                    <div id="invocador-view" class="view-block"
+                        style="display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; justify-content: center;">
+
                         <div class="avatar-container-large" onclick="abrirGaleria()">
-                            <img id="profile-img-large" src="img/avatar-default.png" onerror="this.src='img/avatar-default.png'">
+                            <img id="profile-img-large" src="img/avatar-default.png"
+                                onerror="this.src='img/avatar-default.png'">
                             <div class="change-photo-overlay">CAMBIAR</div>
                         </div>
 
-                        <h2 class="card-nick" id="card-nick-display" style="margin: 10px 0; width: 100%;">INVOCANDO...</h2>
+                        <h2 class="card-nick" id="card-nick-display" style="margin: 10px 0; width: 100%;">INVOCANDO...
+                        </h2>
 
                         <div class="card-desc-container">
                             <p id="card-real-name-display" style="display:none;"></p>
                             <p id="card-birth-display" style="display:none;"></p>
                             <p id="card-sexo-display" style="display:none;"></p>
-                            <div class="card-bio" id="card-desc-display" style="margin: 10px auto; max-width: 320px; line-height: 1.6;">Leyendo crónicas...</div>
+                            <div class="card-bio" id="card-desc-display"
+                                style="margin: 10px auto; max-width: 320px; line-height: 1.6;">Leyendo crónicas...</div>
                         </div>
 
                         <p class="perfil-status" id="invocador-rango">RANGO: INICIADO</p>
                     </div>
-                    
+
                     <div class="boton-base-container">
                         <button id="btn-edit-profile" class="btn-dorado-perfil">MODIFICAR DATOS</button>
                     </div>
@@ -159,8 +174,9 @@
 
                 <div class="data-separator"></div>
 
-                <div class="data-column" style="flex: 1; padding-left: 40px; display: flex; flex-direction: column; justify-content: space-between;">
-                    
+                <div class="data-column"
+                    style="flex: 1; padding-left: 40px; display: flex; flex-direction: column; justify-content: space-between;">
+
                     <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
                         <div class="perfil-registro-bloque">
                             <h3 class="registro-titulo">⚔️ ESTRATEGIA PRINCIPAL</h3>
@@ -253,4 +269,5 @@
     <script src="perfil.js"></script>
 
 </body>
+
 </html>

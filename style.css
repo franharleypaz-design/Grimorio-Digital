@@ -30,115 +30,161 @@ body {
 }
 
 a { text-decoration: none; color: inherit; }
-
 /* =========================================
-   2. CABECERA (MAIN HEADER)
+   2. CABECERA (MAIN HEADER) - UNIFICADO
    ========================================= */
+
 .main-header {
+    /* Fondo con textura de pergamino oscuro para dar riqueza visual */
+    background: 
+        radial-gradient(circle at center, rgba(40, 30, 20, 0.85) 0%, rgba(10, 5, 0, 1) 100%),
+        url('img/textura-pergamino-oscuro.jpg'); /* Asegúrate de tener esta imagen en tu carpeta img */
+    background-size: cover;
+    background-blend-mode: multiply;
+    
+    border-bottom: 2px solid #d4af37;
+    padding: 10px 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: var(--header-height);
-    background: linear-gradient(to right, #ffffff 0%, #ffffff 35%, #1a237e 85%, #1a237e 100%);
-    border-bottom: 2px solid var(--accent);
-    padding: 0 30px;
+    min-height: 115px; /* Altura ajustada para el logo imponente */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 1);
+    position: relative;
     z-index: 1000;
-    flex-shrink: 0;
 }
 
+/* CONTENEDOR DE IDENTIDAD */
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 25px;
     cursor: pointer;
 }
 
-.main-logo { height: 50px !important; width: auto; }
+/* LOGO IMPONENTE (LIBRO MÍSTICO) */
+.main-logo {
+    height: 95px !important; /* Tamaño grande y notable */
+    width: auto;
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
+.logo-container:hover .main-logo {
+    transform: scale(1.08) rotate(-2deg);
+}
+
+/* TIPOGRAFÍA LABRADA MÍSTICA REFINADA */
 .logo-text h1 {
-    color: #001a33 !important;
-    font-size: 1.3rem;
-    margin: 0;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.8rem !important; /* Achicado ligeramente para mejor legibilidad */
     font-weight: 700;
+    margin: 0;
+    line-height: 0.85;
+    /* Degradado dorado metálico */
+    background: linear-gradient(to bottom, #f7ef8a 0%, #d4af37 45%, #b8860b 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-transform: uppercase;
     letter-spacing: 1px;
-    text-transform: uppercase;
+    filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.8));
 }
 
-.logo-text .subtitle {
-    color: #c5a059 !important;
-    font-size: 0.6rem;
-    margin: 0;
+/* SUBTÍTULO ESPACIADO (MODO / SANTUARIO) */
+.logo-text .subtitle, 
+.logo-text #slot-id-display {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem !important;
+    color: #d4af37 !important;
+    margin: 8px 0 0 5px;
+    letter-spacing: 6px; /* Espaciado ancho místico como en la referencia */
+    text-transform: uppercase;
     font-weight: 700;
-    letter-spacing: 2.5px;
+    opacity: 0.9;
+    display: block;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* DECORATIVO ■ */
+.accent-on-light {
+    position: relative;
+    display: inline-block;
+}
+
+.accent-on-light::after {
+    content: "■";
+    font-size: 12px;
+    color: #d4af37;
+    vertical-align: middle;
+    margin-left: 15px;
+    text-shadow: 0 0 8px #f7ef8a;
+    opacity: 0.6;
+    -webkit-text-fill-color: #d4af37;
+}
+
+/* BLOQUE DE ACCIONES */
+.header-action-block {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 100%;
+}
+
+/* BOTONES (ASCENDER / SALIR / LOGIN) */
+#btn-login, .btn-ascender, .btn-salir, .btn-místico {
+    background: linear-gradient(to bottom, #8b1a1a, #5a0000) !important;
+    border: 1px solid #d4af37 !important;
+    color: white !important;
+    padding: 10px 25px !important;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
     text-transform: uppercase;
-    line-height: 1.2;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    font-size: 0.85rem;
 }
 
-.accent-on-light { color: #8b1a1a; font-weight: 700; }
-
-.header-action-block { display: flex; align-items: center; gap: 20px; height: 100%; }
-
-#btn-login, .btn-ascender {
-    all: unset;
-    display: none; 
-    background: linear-gradient(45deg, #d4af37, #f9f1c0, #d4af37) !important;
-    background-size: 200% auto !important;
-    color: #000 !important;
-    border: 1px solid #fff !important;
-    padding: 6px 18px !important;
-    font-weight: 900 !important;
-    font-size: 0.8rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    cursor: pointer !important;
-    border-radius: 4px !important;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6) !important;
-    transition: 0.3s all ease !important;
-    animation: brilloAura 3s infinite alternate, floating 4s infinite ease-in-out;
+#btn-login:hover, .btn-ascender:hover, .btn-salir:hover, .btn-místico:hover {
+    filter: brightness(1.3);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+    color: white !important;
 }
 
+/* USUARIO LOGUEADO */
 #user-logged {
-    display: none;
+    display: flex; /* Cambiar a flex cuando el JS lo active */
     align-items: center;
     gap: 15px;
-    animation: fadeInElement 0.4s ease-out;
 }
 
 #display-name-text {
     color: white !important;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
     text-transform: uppercase;
+    font-family: 'Cinzel', serif;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
 }
 
 .avatar-header {
-    width: 45px;
-    height: 45px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
-    border: 2px solid var(--accent);
+    border: 2px solid #d4af37;
     object-fit: cover;
     cursor: pointer;
     transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-.avatar-header:hover { transform: scale(1.1); border-color: #fff; }
-
-.btn-salir {
-    background: linear-gradient(to bottom, #8b1a1a, #5a0a0a);
-    border: 1px solid var(--accent);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 8px 14px;
-    cursor: pointer;
-    text-transform: uppercase;
-    border-radius: 3px;
-    transition: 0.3s;
+.avatar-header:hover {
+    transform: scale(1.1) rotate(5deg);
+    border-color: #f7ef8a;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
 }
-
-.btn-salir:hover { background: var(--accent); color: #000; }
-
 /* =========================================
    3. INDEX - PORTAL Y NAVEGACIÓN
    ========================================= */
@@ -1021,13 +1067,32 @@ a { text-decoration: none; color: inherit; }
     padding-bottom: 50px; /* Espacio extra al final para que no choque con el borde */
 }
 
-/* Ajuste para el grid de mazos adquiridos */
-#grid-mazos-copiados {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    /* Quitamos el max-height si quieres que se vea todo estirado, 
-       o lo dejamos con scroll interno si prefieres mantener el orden */
-    max-height: none !important; 
-    overflow: visible !important;
+/* Estilo para los títulos de mazos adquiridos (reemplaza el azul feo) */
+.item-copiado .slot-name {
+    color: #ffffff !important; /* Blanco puro para el nombre */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    font-size: 0.85rem;
+    line-height: 1.2;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Si el título es un enlace (<a>), forzamos que no sea azul */
+#grid-mazos-copiados a {
+    color: #fff !important;
+    text-decoration: none !important;
+}
+
+/* Estilo para el prefijo "COPIA:" en dorado */
+.item-copiado .slot-name strong, 
+.item-copiado .prefijo-copia {
+    color: var(--accent) !important; /* Dorado MyL */
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+/* Ajuste para que los nombres largos no rompan el diseño */
+.item-copiado .slot-info {
+    max-width: 70%; /* Evita que el texto choque con los botones */
+    overflow: hidden;
 }

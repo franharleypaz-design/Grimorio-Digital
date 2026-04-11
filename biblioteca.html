@@ -8,7 +8,43 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Sincronización estética del botón de cierre idéntico al Grimorio */
+        /* --- ESTILOS DE BOTONES PARA CARPETAS (IMAGEN REFERENCIA) --- */
+        .folder-actions-row {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-folder-add {
+            flex: 1;
+            background: linear-gradient(to bottom, #d4af37, #b8860b);
+            color: #000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 10px;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-folder-add:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 15px #d4af37;
+            transform: translateY(-2px);
+        }
+
+        /* --- ESTILO BOTÓN CIERRE --- */
         #close-detail {
             all: unset;
             position: absolute !important;
@@ -30,17 +66,13 @@
             z-index: 2100 !important;
             cursor: pointer !important;
             transition: 0.3s ease !important;
-            padding: 0;
-            margin: 0;
         }
 
         #close-detail:hover {
             transform: scale(1.1) rotate(90deg) !important;
             background: #fff !important;
-            box-shadow: 0 0 18px rgba(212, 175, 55, 0.9) !important;
         }
 
-        /* Clase para el botón dorado del Santuario (Consistencia con Perfil) */
         .btn-dorado-santuario {
             background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
             color: #000 !important;
@@ -50,32 +82,17 @@
             font-weight: bold !important;
             font-size: 0.8rem !important;
             cursor: pointer !important;
-            text-transform: uppercase !important;
             border-radius: 4px !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 0 5px rgba(255,255,255,0.5) !important;
             transition: 0.3s !important;
-            letter-spacing: 1px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 8px !important;
-            text-decoration: none !important;
             min-width: 220px;
         }
 
-        .btn-dorado-santuario:hover {
-            background: #fff !important;
-            color: #000 !important;
-            box-shadow: 0 0 20px var(--accent) !important;
-            transform: translateY(-2px) !important;
-        }
-
-        /* Ajuste del contenedor de contenido para permitir el botón absoluto */
         .detail-content {
             position: relative;
             width: 100%;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
     </style>
 </head>
@@ -85,10 +102,10 @@
     <header class="main-header">
         <div class="header-identity-block">
             <div class="logo-container" onclick="location.href='index.html'" style="cursor:pointer;">
-                <img src="logo-fenix.png" alt="Fénix MyL" class="main-logo">
+                <img src="img/logo-Grimorio-digital.png" alt="Grimorio Digital" class="main-logo">
                 <div class="logo-text">
-                    <h1>GRIMORIO DE <span class="accent-on-light">MITOLOGÍA</span></h1>
-                    <p class="subtitle">PRIMERA ERA Y PRIMER BLOQUE</p>
+                    <h1>GRIMORIO <span class="accent-on-light">DIGITAL</span></h1>
+                    <p class="subtitle">SANTUARIO DE ESTRATEGIA</p>
                 </div>
             </div>
         </div>
@@ -99,8 +116,7 @@
             <div id="user-logged" style="display: none;">
                 <span id="display-name-text"></span>
                 <img id="user-photo" class="avatar-header" src="img/avatar-default.png"
-                    onclick="location.href='perfil.html'" title="Mi Perfil" style="cursor: pointer;"
-                    onerror="this.src='img/avatar-default.png'; this.onerror=null;">
+                    onclick="location.href='perfil.html'">
                 <button id="btn-logout" class="btn-salir">SALIR</button>
             </div>
         </div>
@@ -109,7 +125,6 @@
     <div class="main-layout" id="main-library">
 
         <aside class="sidebar" id="sidebar">
-
             <section class="filter-group">
                 <h3>EDICIONES</h3>
                 <ul class="filter-list">
@@ -134,17 +149,17 @@
                 <h3>ESTADÍSTICAS</h3>
                 <div class="range-container">
                     <label>Coste Máx: <span id="val-coste">10</span></label>
-                    <input type="range" id="filter-coste" min="0" max="10" value="10" oninput="filtrarCartas()">
+                    <input type="range" id="filter-coste" min="0" max="10" value="10">
                 </div>
                 <div class="range-container">
                     <label>Fuerza Mín: <span id="val-fuerza">0</span></label>
-                    <input type="range" id="filter-fuerza" min="0" max="12" value="0" oninput="filtrarCartas()">
+                    <input type="range" id="filter-fuerza" min="0" max="12" value="0">
                 </div>
             </section>
 
             <section class="filter-group">
                 <h3>RAZAS</h3>
-                <select id="raza-filter" onchange="filtrarCartas()">
+                <select id="raza-filter">
                     <option value="">Todas las razas</option>
                     <option value="caballero">Caballero</option>
                     <option value="dragon">Dragón</option>
@@ -189,15 +204,15 @@
 
             <div class="detail-hability" id="detail-text"></div>
 
-            <div id="save-button-container"></div>
+            <div id="save-button-container" style="width: 100%;"></div>
 
             <p id="detail-illustrator" class="detail-illustrator"></p>
 
             <div id="related-cards-section" style="margin-top: 20px; width: 100%; display: none;">
-                <p style="font-size: 0.7rem; color: #888; margin-bottom: 10px; letter-spacing: 1px;">CARTAS REFERENCIALES:</p>
+                <p style="font-size: 0.7rem; color: #888; margin-bottom: 10px; letter-spacing: 1px;">CARTAS
+                    REFERENCIALES:</p>
                 <div id="related-buttons-container"
-                    style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                </div>
+                    style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;"></div>
             </div>
         </div>
     </div>
@@ -207,7 +222,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <script src="app.js"></script>
+    <script src="biblioteca.js"></script>
 </body>
 
 </html>

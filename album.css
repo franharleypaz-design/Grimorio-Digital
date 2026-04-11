@@ -1,0 +1,587 @@
+/* ==========================================
+
+   ALBUM.CSS - ESTILO INTEGRAL DEL SANTUARIO
+
+   ========================================== */
+
+
+
+/* 1. RESET Y BLOQUEO DE SCROLL GLOBAL - FUERZA BRUTA */
+
+html body.body-album {
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    height: 100vh !important;
+
+    background-color: #000 !important;
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+
+/* 2. LAYOUT PRINCIPAL - INDEPENDIENTE DE STYLE.CSS */
+
+html body.body-album .album-layout-container {
+
+    display: grid !important;
+
+    grid-template-columns: 250px 1fr 340px !important;
+
+    gap: 12px !important;
+
+    padding: 12px !important;
+
+    height: calc(100vh - 75px) !important;
+
+    width: 100vw !important;
+
+    max-width: 100vw !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    background: transparent !important;
+
+    margin: 0 !important;
+
+}
+
+
+
+/* 3. ESTILO DE "CAJAS DORADAS" (Blindaje de visibilidad) */
+
+html body.body-album .sidebar,
+
+html body.body-album .content-gallery,
+
+html body.body-album .right-content {
+
+    background: rgba(5, 5, 5, 0.95) !important;
+
+    border: 1px solid #d4af37 !important;
+
+    border-radius: 8px !important;
+
+    height: 100% !important;
+
+    width: auto !important;
+
+    overflow-y: auto !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    padding: 15px !important;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+
+}
+
+
+
+/* 4. COLUMNA IZQUIERDA (SIDEBAR - FILTROS) */
+
+.sidebar h3 {
+
+    font-size: 0.85rem !important;
+
+    color: #d4af37 !important;
+
+    margin-bottom: 15px !important;
+
+    border-bottom: 1px solid rgba(212, 175, 55, 0.4) !important;
+
+    padding-bottom: 5px !important;
+
+    font-family: 'Cinzel', serif !important;
+
+    text-transform: uppercase;
+
+    text-align: center;
+
+}
+
+
+
+.filter-group {
+
+    margin-bottom: 25px;
+
+}
+
+
+
+.sidebar select, .sidebar input[type="text"] {
+
+    background-color: #000 !important;
+
+    border: 1px solid #d4af37 !important;
+
+    color: #d4af37 !important;
+
+    padding: 8px 12px !important;
+
+    font-family: 'Cinzel', serif !important;
+
+    font-size: 0.8rem !important;
+
+    width: 100% !important;
+
+    border-radius: 4px !important;
+
+    margin-top: 5px;
+
+    box-sizing: border-box;
+
+}
+
+
+
+.btn-exhibicion {
+
+    width: 100% !important;
+
+    background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
+
+    color: #000 !important;
+
+    border: 1px solid #fff !important;
+
+    padding: 12px !important;
+
+    font-family: 'Cinzel', serif !important;
+
+    font-weight: bold !important;
+
+    cursor: pointer !important;
+
+    text-transform: uppercase !important;
+
+    border-radius: 4px !important;
+
+    margin-bottom: 10px !important;
+
+}
+
+
+
+.btn-exhibicion.active-filter {
+
+    background: #fff !important;
+
+    color: #000 !important;
+
+    box-shadow: 0 0 15px #ffcc00 !important;
+
+    border-color: #ffcc00 !important;
+
+}
+
+
+
+/* 5. ÁREA CENTRAL (GALERÍA - EXPANSIÓN TOTAL) */
+
+html body.body-album .content-gallery {
+
+    padding: 20px !important;
+
+    display: block !important;
+
+    width: 100% !important;
+
+    max-width: none !important;
+
+    margin: 0 !important;
+
+}
+
+
+
+.card-grid {
+
+    display: grid !important;
+
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+
+    gap: 15px !important;
+
+    width: 100% !important;
+
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    justify-items: start !important;
+
+}
+
+
+
+.card-item {
+
+    width: 100% !important;
+
+    max-width: 180px !important;
+
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    cursor: pointer;
+
+    display: flex;
+
+    justify-content: flex-start;
+
+}
+
+
+
+.card-item img {
+
+    width: 100% !important;
+
+    height: auto !important;
+
+    border-radius: 5px !important;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
+
+    border: 1px solid #333 !important;
+
+}
+
+
+
+.card-item:hover {
+
+    transform: scale(1.05);
+
+    z-index: 10;
+
+}
+
+
+
+/* 6. PANEL DERECHO (ESTILO TALLER / CONSTRUCTOR) */
+
+html body.body-album .right-content {
+
+    background: #050505 !important;
+
+    padding: 20px !important;
+
+    border-radius: 8px !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+}
+
+
+
+.content-header-title {
+
+    color: #d4af37 !important;
+
+    text-align: center !important;
+
+    font-size: 1.4rem !important;
+
+    margin: 0 0 15px 0 !important;
+
+    font-family: 'Cinzel Decorative', cursive !important;
+
+    text-transform: uppercase;
+
+    letter-spacing: 2px;
+
+}
+
+
+
+.stats-bar-album {
+
+    text-align: center !important;
+
+    font-family: 'Cinzel', serif !important;
+
+    color: #c5a059 !important;
+
+    padding: 15px !important;
+
+    background: rgba(255, 255, 255, 0.05) !important;
+
+    border: 1px solid rgba(212, 175, 55, 0.2) !important;
+
+    border-radius: 4px !important;
+
+    margin-bottom: 20px !important;
+
+    font-size: 0.9rem !important;
+
+}
+
+
+
+#deck-list-container {
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding-right: 5px;
+
+}
+
+
+
+/* Item de carta individual: Layout horizontal para alinear controles a la derecha */
+
+.deck-card-item {
+
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center !important;
+
+    gap: 12px !important;
+
+    background: linear-gradient(135deg, #1a1a1a 0%, #111 100%) !important;
+
+    margin-bottom: 8px !important;
+
+    padding: 10px 12px !important;
+
+    border-radius: 4px !important;
+
+    border: 1px solid #333 !important;
+
+    transition: 0.2s;
+
+    position: relative;
+
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.5) !important;
+
+}
+
+
+
+.deck-card-item:hover {
+
+    border-color: rgba(212, 175, 55, 0.5) !important;
+
+    background: rgba(255, 255, 255, 0.07) !important;
+
+}
+
+
+
+/* Estado de favorito activo */
+
+.deck-card-item.is-fav {
+
+    border-left: 3px solid #ffcc00 !important;
+
+    background: rgba(255, 204, 0, 0.05) !important;
+
+}
+
+
+
+.deck-card-qty {
+
+    font-weight: bold !important;
+
+    color: #fff !important;
+
+    font-size: 1.1rem !important;
+
+    font-family: 'Cinzel', serif !important;
+
+    min-width: 35px !important;
+
+    text-align: center;
+
+}
+
+
+
+.deck-card-info {
+
+    flex: 1;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    padding-left: 5px;
+
+}
+
+
+
+.deck-card-info strong {
+
+    color: #fff !important;
+
+    display: block !important;
+
+    font-size: 0.85rem !important;
+
+    text-transform: uppercase !important;
+
+    letter-spacing: 0.5px;
+
+    line-height: 1.2;
+
+}
+
+
+
+.deck-card-info small {
+
+    color: #888 !important;
+
+    text-transform: uppercase !important;
+
+    font-size: 0.7rem !important;
+
+}
+
+
+
+/* CONTENEDOR DE CONTROLES: Alineación horizontal a la derecha */
+
+.deck-card-controls {
+
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center !important;
+
+    gap: 6px !important;
+
+}
+
+
+
+/* Botones de control (Estrella y +/-) */
+
+.btn-fav-toggle, .btn-qty-control {
+
+    all: unset;
+
+    background: #1a1a1a !important;
+
+    border: 1px solid #444 !important;
+
+    color: #fff !important;
+
+    width: 28px !important;
+
+    height: 28px !important;
+
+    cursor: pointer;
+
+    border-radius: 4px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    transition: 0.2s;
+
+    font-size: 0.9rem !important;
+
+}
+
+
+
+.btn-fav-toggle:hover, .btn-qty-control:hover {
+
+    background: #d4af37 !important;
+
+    color: #000 !important;
+
+    border-color: #fff !important;
+
+}
+
+
+
+.btn-fav-toggle.is-fav {
+
+    color: #ffcc00 !important;
+
+    text-shadow: 0 0 8px #ffcc00;
+
+}
+
+
+
+/* 7. BOTÓN GUARDAR FINAL */
+
+.btn-save-album {
+
+    width: 100% !important;
+
+    margin-top: 15px !important;
+
+    background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
+
+    color: #000 !important;
+
+    border: 1px solid #fff !important;
+
+    padding: 16px !important;
+
+    font-family: 'Cinzel', serif !important;
+
+    font-weight: bold !important;
+
+    cursor: pointer !important;
+
+    text-transform: uppercase !important;
+
+    border-radius: 4px;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+
+}
+
+
+
+.btn-save-album:hover {
+
+    background: #fff !important;
+
+    box-shadow: 0 0 20px #d4af37 !important;
+
+}
+
+
+
+/* SCROLLBAR CUSTOM */
+
+::-webkit-scrollbar { width: 5px !important; }
+
+::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2) !important; }
+
+::-webkit-scrollbar-thumb { background: #d4af37 !important; border-radius: 10px !important; }

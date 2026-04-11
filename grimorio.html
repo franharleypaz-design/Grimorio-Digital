@@ -4,22 +4,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Grimorio - Crónicas del Reino</title>
+    <title>Mi Grimorio - Grimorio Digital</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
         /* --- CORRECCIÓN DE SCROLL GLOBAL --- */
-        html, body.body-grimorio {
-            height: auto !important; /* Permite que el contenido defina la altura */
+        html,
+        body.body-grimorio {
+            height: auto !important;
             min-height: 100vh;
-            overflow-y: auto !important; /* Habilita scroll vertical */
+            overflow-y: auto !important;
             overflow-x: hidden;
-            display: block; /* Desactiva posibles restricciones de flexbox/grid del body */
+            display: block;
+            background-color: #000;
+        }
+
+        /* --- ESTILO LOGO GRIMORIO DIGITAL --- */
+        .logo-text h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to bottom, #f7ef8a 0%, #d4af37 45%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+            letter-spacing: 1px;
+        }
+
+        .accent-on-light {
+            position: relative;
+            display: inline-block;
+            padding: 0 15px;
+        }
+
+        .accent-on-light::before {
+            content: "■";
+            position: absolute;
+            left: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #d4af37;
+            text-shadow: -6px 4px 0 #b8860b, 4px -4px 0 #f7ef8a;
+            opacity: 0.8;
+        }
+
+        .accent-on-light::after {
+            content: "■";
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #d4af37;
+            text-shadow: 6px -4px 0 #b8860b, -4px 4px 0 #f7ef8a;
+            opacity: 0.8;
         }
 
         .content-grimorio {
-            overflow: visible !important; /* Asegura que el contenedor no corte el contenido */
-            padding-bottom: 80px; /* Espacio de seguridad al final */
+            overflow: visible !important;
+            padding-bottom: 80px;
         }
 
         /* ESTILOS PARA MAZOS Y CARPETAS */
@@ -56,14 +103,12 @@
             margin-top: 15px;
         }
 
-        /* REJILLA ESPECÍFICA PARA MAZOS ADQUIRIDOS */
         #grid-mazos-copiados {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             padding: 10px;
-            /* Quitamos max-height para que la página crezca naturalmente */
-            max-height: none !important; 
+            max-height: none !important;
             overflow: visible !important;
         }
 
@@ -83,18 +128,15 @@
             background: rgba(212, 175, 55, 0.05);
         }
 
-        .item-copiado {
-            min-height: 80px;
-            border-left: 4px solid #3b82f6;
-        }
-
         .slot-info {
             display: flex;
             flex-direction: column;
+            max-width: 70%;
+            overflow: hidden;
         }
 
         .slot-name {
-            color: #fff;
+            color: #fff !important;
             font-weight: bold;
             font-size: 0.9rem;
             text-transform: uppercase;
@@ -155,6 +197,12 @@
             background: #fff;
         }
 
+        /* --- OCULTAR BOTONES DE ENLACE EN CARPETAS Y MAZOS COPIADOS --- */
+        [data-slot-id^="carpeta"] .btn-slot-icon[title*="ID"],
+        .item-copiado .btn-slot-icon[title*="Sello"] {
+            display: none !important;
+        }
+
         .import-box {
             margin-top: 20px;
             display: flex;
@@ -201,6 +249,7 @@
             .seccion-gestion {
                 grid-template-columns: 1fr;
             }
+
             #grid-mazos-copiados {
                 grid-template-columns: 1fr;
             }
@@ -209,21 +258,19 @@
 </head>
 
 <body class="body-grimorio">
-
     <header class="main-header">
         <div class="header-identity-block">
-            <div class="logo-container" onclick="location.href='index.html'" style="cursor:pointer;">
-                <img src="logo-fenix.png" alt="Fénix MyL" class="main-logo">
+            <div class="logo-container" onclick="location.href='grimorio.html'" style="cursor:pointer;">
+                <img src="img/logo-Grimorio-digital.png" alt="Grimorio Digital" class="main-logo">
                 <div class="logo-text">
-                    <h1>GRIMORIO DE <span class="accent-on-light">MITOLOGÍA</span></h1>
-                    <p class="subtitle">PRIMERA ERA Y PRIMER BLOQUE</p>
+                    <h1>GRIMORIO <span class="accent-on-light">DIGITAL</span></h1>
+                    <p class="subtitle">SANTUARIO DE ESTRATEGIA</p>
                 </div>
             </div>
         </div>
 
         <div class="header-action-block">
-            <button id="btn-login">ASCENDER</button>
-            <div id="user-logged" style="display: none;">
+            <div id="user-logged">
                 <span id="display-name-text"></span>
                 <img id="user-photo" class="avatar-header" src="img/avatar-default.png"
                     onclick="location.href='perfil.html'">
@@ -236,7 +283,8 @@
 
         <div class="folder-header-fixed">
             <div class="title-section">
-                <h2 id="folder-title">SANTUARIO DE ESTRATEGIA</h2>
+                <h2 id="folder-title" style="font-family: 'Cinzel Decorative', serif; color: var(--accent);">REGISTROS
+                    DEL SANTUARIO</h2>
                 <p class="folder-subtitle">Gestiona tus mazos de guerra y carpetas de intercambio</p>
             </div>
             <div class="folder-actions">
@@ -257,10 +305,12 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo1', this)" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo1', this)"
+                                title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('mazo1')" title="Renombrar">✏️</button>
-                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo1')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="irAConstructor('mazo1')">GESTIONAR</button>
+                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo1')"
+                                title="Vaciar Slot">🗑️</button>
+                            <button class="btn-slot-open" onclick="navegarAGestion('mazo1')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="mazo2">
@@ -269,10 +319,12 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo2', this)" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo2', this)"
+                                title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('mazo2')" title="Renombrar">✏️</button>
-                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo2')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="irAConstructor('mazo2')">GESTIONAR</button>
+                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo2')"
+                                title="Vaciar Slot">🗑️</button>
+                            <button class="btn-slot-open" onclick="navegarAGestion('mazo2')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="mazo3">
@@ -281,10 +333,12 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo3', this)" title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('mazo3', this)"
+                                title="Compartir ID">🔗</button>
                             <button class="btn-slot-icon" onclick="renombrarSlot('mazo3')" title="Renombrar">✏️</button>
-                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo3')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="irAConstructor('mazo3')">GESTIONAR</button>
+                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('mazo3')"
+                                title="Vaciar Slot">🗑️</button>
+                            <button class="btn-slot-open" onclick="navegarAGestion('mazo3')">GESTIONAR</button>
                         </div>
                     </div>
                 </div>
@@ -303,10 +357,13 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta1', this)" title="Compartir ID">🔗</button>
-                            <button class="btn-slot-icon" onclick="renombrarSlot('carpeta1')" title="Renombrar">✏️</button>
-                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta1')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="irAConstructor('carpeta1')">GESTIONAR</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta1', this)"
+                                title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="renombrarSlot('carpeta1')"
+                                title="Renombrar">✏️</button>
+                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta1')"
+                                title="Vaciar Slot">🗑️</button>
+                            <button class="btn-slot-open" onclick="navegarAGestion('carpeta1')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="carpeta2">
@@ -315,10 +372,13 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta2', this)" title="Compartir ID">🔗</button>
-                            <button class="btn-slot-icon" onclick="renombrarSlot('carpeta2')" title="Renombrar">✏️</button>
-                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta2')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="irAConstructor('carpeta2')">GESTIONAR</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta2', this)"
+                                title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="renombrarSlot('carpeta2')"
+                                title="Renombrar">✏️</button>
+                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta2')"
+                                title="Vaciar Slot">🗑️</button>
+                            <button class="btn-slot-open" onclick="navegarAGestion('carpeta2')">GESTIONAR</button>
                         </div>
                     </div>
                     <div class="slot-item" data-slot-id="carpeta3">
@@ -327,10 +387,13 @@
                             <span class="slot-count">0 Cartas</span>
                         </div>
                         <div class="slot-controls">
-                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta3', this)" title="Compartir ID">🔗</button>
-                            <button class="btn-slot-icon" onclick="renombrarSlot('carpeta3')" title="Renombrar">✏️</button>
-                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta3')" title="Vaciar Slot">🗑️</button>
-                            <button class="btn-slot-open" onclick="irAConstructor('carpeta3')">GESTIONAR</button>
+                            <button class="btn-slot-icon" onclick="copiarIDAlPortapapeles('carpeta3', this)"
+                                title="Compartir ID">🔗</button>
+                            <button class="btn-slot-icon" onclick="renombrarSlot('carpeta3')"
+                                title="Renombrar">✏️</button>
+                            <button class="btn-slot-icon btn-del" onclick="limpiarSlot('carpeta3')"
+                                title="Vaciar Slot">🗑️</button>
+                            <button class="btn-slot-open" onclick="navegarAGestion('carpeta3')">GESTIONAR</button>
                         </div>
                     </div>
                 </div>
@@ -342,30 +405,32 @@
 
         <section id="seccion-copias" class="bloque-místico" style="margin-top: 20px; display: none;">
             <h3>✨ MAZOS ADQUIRIDOS <span>(MÁX 6)</span></h3>
-            <div id="grid-mazos-copiados">
-                </div>
+            <div id="grid-mazos-copiados"></div>
         </section>
-
-        <div id="results-info">Cartas en vista actual: <span id="card-count">0</span></div>
-        <div class="card-grid" id="card-display"></div>
     </main>
 
-    <div id="card-detail-panel" class="detail-panel">
-        <button id="close-detail" aria-label="Cerrar">×</button>
-        <div class="detail-content">
-            <img src="" id="detail-img">
-            <h2 id="detail-name"></h2>
-            <p id="detail-type"></p>
-            <div class="detail-hability" id="detail-text"></div>
-            <div id="save-button-container" style="margin-top: 20px;"></div>
-            <div id="related-cards-section" style="display:none; margin-top: 20px; border-top: 1px solid #444; padding-top: 10px;">
-                <p style="font-size: 0.8em; color: #aaa; margin-bottom: 10px;">CARTAS RELACIONADAS:</p>
-                <div id="related-buttons-container"></div>
-            </div>
+    <div id="modal-renombrar" class="avatar-gallery" style="display:none; flex-direction: column; gap: 20px;">
+        <h3 style="font-family: 'Cinzel', serif; color: var(--accent); margin-bottom: 10px;">RENOMBRAR REGISTRO</h3>
+        <input type="text" id="input-nuevo-nombre" maxlength="35" placeholder="Escribe el nuevo nombre..."
+            style="width: 100%; background: #000; border: 1px solid var(--accent); color: #fff; padding: 12px; font-family: 'Cinzel'; border-radius: 4px; text-align: center; text-transform: uppercase;">
+        <p style="font-size: 0.6rem; color: #888; text-align: center;">MÁXIMO 35 CARACTERES</p>
+        <div class="edit-buttons-match" style="display: flex; gap: 10px; justify-content: center;">
+            <button class="btn-vincular-match" id="btn-confirmar-nombre" style="flex:1;">CONFIRMAR</button>
+            <button class="btn-abortar-match" onclick="cerrarModalRenombrar()" style="flex:1;">CANCELAR</button>
         </div>
     </div>
 
     <div id="toast-container"></div>
+
+    <script>
+        function navegarAGestion(slotId) {
+            if (slotId.includes('mazo') || slotId.startsWith('copia_')) {
+                window.location.href = `constructor.html?slot=${slotId}`;
+            } else {
+                window.location.href = `album.html?slot=${slotId}`;
+            }
+        }
+    </script>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>

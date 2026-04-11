@@ -1,93 +1,123 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Constructor de Estrategia - Crónicas del Reino</title>
-    
+    <title>Constructor de Estrategia - Grimorio Digital</title>
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="constructor.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* --- ESTILO HEADER UNIFICADO --- */
+        .main-header {
+            background: linear-gradient(to right, #0a0a0a, #1a1a1a, #0a0a0a);
+            border-bottom: 2px solid #d4af37;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 80px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+        }
+
+        .main-logo {
+            height: 65px;
+            width: auto;
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+        }
+
+        .logo-text h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2.2rem;
+            margin: 0;
+            background: linear-gradient(to bottom, #f7ef8a 0%, #d4af37 45%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .accent-on-light {
+            position: relative;
+            display: inline-block;
+        }
+
+        .accent-on-light::before,
+        .accent-on-light::after {
+            content: "■";
+            font-size: 10px;
+            color: #d4af37;
+            vertical-align: middle;
+            margin: 0 10px;
+            text-shadow: 0 0 5px #f7ef8a;
+            opacity: 0.7;
+        }
+
+        .logo-text .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: #d4af37;
+            margin: 0;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
+
 <body class="body-constructor">
 
     <header class="main-header">
         <div class="header-identity-block">
             <div class="logo-container" onclick="location.href='grimorio.html'" style="cursor:pointer;">
-                <img src="logo-fenix.png" alt="Fénix MyL" class="main-logo">
+                <img src="img/logo-Grimorio-digital.png" alt="Grimorio Digital" class="main-logo">
                 <div class="logo-text">
-                    <h1 id="constructor-title">TALLER DE ESTRATEGIA</h1>
-                    <p class="subtitle" id="slot-id-display">SINCRONIZANDO REGISTROS...</p>
+                    <h1>GRIMORIO <span class="accent-on-light">DIGITAL</span></h1>
+                    <p class="subtitle">SANTUARIO DE ESTRATEGIA</p>
                 </div>
             </div>
         </div>
+
         <div class="header-action-block">
-            <button onclick="location.href='grimorio.html'" class="btn-salir">SALIR DEL TALLER</button>
+            <div id="user-logged">
+                <span id="display-name-text"></span>
+                <img id="user-photo" class="avatar-header" src="img/avatar-default.png"
+                    onclick="location.href='perfil.html'">
+                <button id="btn-logout" class="btn-salir">SALIR</button>
+            </div>
         </div>
     </header>
 
     <main class="constructor-layout">
-        
+
         <div id="setup-mazo" class="setup-rules-panel">
-            <h3>⚖️ REGLAS:</h3>
-            <select id="select-bloque" onchange="actualizarSetup()">
-                <option value="">ELEGIR ERA...</option>
-                <option value="primera-era">PRIMERA ERA (Reto a Dragón)</option>
-                <option value="segunda-era">SEGUNDA ERA (Espada a Ra)</option>
-            </select>
-            <select id="select-formato" onchange="actualizarSetup()">
-                <option value="libre">FORMATO LIBRE</option>
-                <option value="racial-libre">RACIAL LIBRE</option>
-                <option value="racial-edicion">RACIAL EDICIÓN</option>
-            </select>
-            <select id="select-raza" style="display: none;" onchange="actualizarSetup()">
-                <option value="">ELEGIR RAZA...</option>
-                <option value="Caballero">CABALLERO</option>
-                <option value="Guerrero">GUERRERO</option>
-                <option value="Mago">MAGO</option>
-                <option value="Sacerdote">SACERDOTE</option>
-                <option value="Sombra">SOMBRA</option>
-                <option value="Bestia">BESTIA</option>
-                <option value="Dragón">DRAGÓN</option>
-                <option value="Faerie">FAERIE</option>
-            </select>
-        </div>
+            <h2 id="setup-instruction" class="setup-main-title">ESTABLECE LAS REGLAS DEL REINO PARA DESBLOQUEAR EL
+                GRIMORIO</h2>
 
-        <aside class="sidebar">
-            <div class="filter-group" id="folder-fav-filter" style="display: none;">
-                <h3>EXHIBICIÓN</h3>
-                
-                <button id="btn-show-owned" class="btn-mystick-nav" style="width: 100%; margin-bottom: 10px; justify-content: center;" onclick="toggleMostrarCarpeta()">
-                    🗂️ VER MI CARPETA
-                </button>
-                
-                <button id="btn-show-favs" class="btn-mystick-nav" style="width: 100%; justify-content: center;" onclick="toggleMostrarFavoritos()">
-                    ⭐ VER FAVORITOS
-                </button>
-            </div>
+            <div class="setup-controls-row">
+                <span class="label-icon">⚖️ REGLAS DEL REINO:</span>
 
-            <div class="filter-group">
-                <h3>BUSCADOR</h3>
-                <input type="text" id="main-search" placeholder="Nombre o Habilidad..." oninput="filtrarCartas()">
-            </div>
-
-            <div class="filter-group">
-                <h3>FILTRAR POR TIPO</h3>
-                <select id="tipo-filter" onchange="filtrarCartas()" style="width: 100%;">
-                    <option value="">TODOS LOS TIPOS</option>
-                    <option value="Aliado">ALIADO</option>
-                    <option value="Talismán">TALISMÁN</option>
-                    <option value="Tótem">TÓTEM</option>
-                    <option value="Arma">ARMA</option>
-                    <option value="Oro">ORO</option>
+                <select id="select-bloque" onchange="actualizarSetup()">
+                    <option value="">1. ELEGIR ERA...</option>
+                    <option value="primera-era">PRIMERA ERA (Reto a Dragón)</option>
+                    <option value="segunda-era">SEGUNDA ERA (Espada a Ra)</option>
                 </select>
-            </div>
-            
-            <div class="filter-group">
-                <h3>RAZA ESPECÍFICA</h3>
-                <select id="raza-filter" onchange="filtrarCartas()" style="width: 100%;">
-                    <option value="">TODAS LAS RAZAS</option>
+
+                <select id="select-formato" style="display: none;" onchange="actualizarSetup()">
+                    <option value="">2. ELEGIR FORMATO...</option>
+                    <option value="libre">FORMATO LIBRE</option>
+                    <option value="racial-libre">RACIAL LIBRE</option>
+                    <option value="racial-edicion">RACIAL EDICIÓN</option>
+                </select>
+
+                <select id="select-raza" style="display: none;" onchange="actualizarSetup()">
+                    <option value="">3. ELEGIR RAZA...</option>
                     <option value="Caballero">CABALLERO</option>
                     <option value="Guerrero">GUERRERO</option>
                     <option value="Mago">MAGO</option>
@@ -98,28 +128,134 @@
                     <option value="Faerie">FAERIE</option>
                 </select>
             </div>
+        </div>
+
+        <aside class="sidebar sidebar-hidden">
+            <div id="buscador-lateral-content">
+                <div class="filter-group" id="folder-fav-filter" style="display: none;">
+                    <h3>EXHIBICIÓN</h3>
+                    <button id="btn-show-owned" class="btn-mystick-nav"
+                        style="width: 100%; margin-bottom: 10px; justify-content: center;"
+                        onclick="toggleMostrarCarpeta()">
+                        🗂️ MI CARPETA
+                    </button>
+                    <button id="btn-show-favs" class="btn-mystick-nav" style="width: 100%; justify-content: center;"
+                        onclick="toggleMostrarFavoritos()">
+                        ⭐ FAVORITOS
+                    </button>
+                </div>
+
+                <div class="filter-group">
+                    <h3>BUSCADOR</h3>
+                    <input type="text" id="main-search" placeholder="Nombre o Habilidad..." oninput="filtrarCartas()">
+                </div>
+
+                <div class="filter-group">
+                    <h3>TIPO</h3>
+                    <select id="tipo-filter" onchange="filtrarCartas()" style="width: 100%;">
+                        <option value="">TODOS</option>
+                        <option value="Aliado">ALIADO</option>
+                        <option value="Talismán">TALISMÁN</option>
+                        <option value="Tótem">TÓTEM</option>
+                        <option value="Arma">ARMA</option>
+                        <option value="Oro">ORO</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <h3>RAZA</h3>
+                    <select id="raza-filter" onchange="filtrarCartas()" style="width: 100%;">
+                        <option value="">TODAS</option>
+                        <option value="Caballero">CABALLERO</option>
+                        <option value="Guerrero">GUERRERO</option>
+                        <option value="Mago">MAGO</option>
+                        <option value="Sacerdote">SACERDOTE</option>
+                        <option value="Sombra">SOMBRA</option>
+                        <option value="Bestia">BESTIA</option>
+                        <option value="Dragón">DRAGÓN</option>
+                        <option value="Faerie">FAERIE</option>
+                    </select>
+                </div>
+            </div>
         </aside>
 
         <section class="content-scroll">
+            <div id="lock-overlay" class="lock-screen"></div>
             <div class="card-grid" id="card-display"></div>
         </section>
 
         <aside class="deck-builder-panel">
             <div class="deck-stats-header">
                 <h3 id="current-slot-name">MI ESTRATEGIA</h3>
+
                 <div class="stat-grid">
-                    <div>TOTAL: <strong id="total-cards">0</strong> / 50</div>
+                    <div>ORO INICIAL: <strong id="stat-oro-ini">NO</strong></div>
                     <div>ALIADOS: <strong id="total-aliados">0</strong></div>
-                    <div>OROS: <strong id="total-oros">0</strong></div>
+                    <div>OROS MAZO: <strong id="total-oros">0</strong></div>
                     <div>OTROS: <strong id="total-otros">0</strong></div>
+                    <div
+                        style="grid-column: span 2; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 5px; margin-top: 5px;">
+                        TOTAL ESTRATEGIA: <strong id="total-cards">0 / 50</strong>
+                    </div>
                 </div>
+
+                <div class="stats-extra-panel">
+                    <div class="arquetipo-container">
+                        <p class="label-mini">TIPO DE ESTRATEGIA</p>
+                        <strong id="arquetipo-sugerido">ANALIZANDO...</strong>
+                    </div>
+
+                    <div class="curva-container">
+                        <p class="label-mini">CURVA DE ORO (0 a 4+)</p>
+                        <div class="curva-visual">
+                            <div class="barra-box">
+                                <div id="bar-0" class="barra" style="height: 0%"></div><span>0</span>
+                            </div>
+                            <div class="barra-box">
+                                <div id="bar-1" class="barra" style="height: 0%"></div><span>1</span>
+                            </div>
+                            <div class="barra-box">
+                                <div id="bar-2" class="barra" style="height: 0%"></div><span>2</span>
+                            </div>
+                            <div class="barra-box">
+                                <div id="bar-3" class="barra" style="height: 0%"></div><span>3</span>
+                            </div>
+                            <div class="barra-box">
+                                <div id="bar-4" class="barra" style="height: 0%"></div><span>4+</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-auto-grid">
+                        <div class="info-item">
+                            <p class="label-mini">SINERGIA RAZA</p>
+                            <strong id="raza-predominante">NINGUNA</strong>
+                        </div>
+                        <div class="info-item">
+                            <p class="label-mini">FUERZA PROM.</p>
+                            <strong id="fuerza-promedio">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="info-auto-grid"
+                        style="margin-top: 10px; border-top: 1px solid rgba(212,175,55,0.1); padding-top: 8px;">
+                        <div class="info-item">
+                            <p class="label-mini">MOTOR ROBO</p>
+                            <strong id="stat-robo" style="color: #aaa;">0</strong>
+                        </div>
+                        <div class="info-item">
+                            <p class="label-mini">CONTROL/ANULA</p>
+                            <strong id="stat-anula" style="color: #aaa;">0</strong>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="status-oro-inicial" class="status-oro-alert">
                     ❌ FALTA ORO SIN HABILIDAD
                 </div>
             </div>
 
-            <div class="deck-content-scroll" id="deck-list-container">
-                </div>
+            <div class="deck-content-scroll" id="deck-list-container"></div>
 
             <div class="deck-actions">
                 <button class="btn-save-deck" onclick="guardarMazoFirebase()">GUARDAR CAMBIOS</button>
@@ -128,13 +264,14 @@
 
     </main>
 
-    <div id="toast-container"></div>
+    <div id="notif-container"></div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
+
     <script src="app.js"></script>
     <script src="constructor.js"></script>
 </body>
+
 </html>
