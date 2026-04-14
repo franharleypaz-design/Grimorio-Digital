@@ -3,69 +3,81 @@
    ========================================= */
 
 /* 0. FONDO GLOBAL */
-html, body {
+html,
+body {
     margin: 0 !important;
     padding: 0 !important;
     min-height: 100vh;
-    background-color: #0d0d0d; 
+    background-color: #0d0d0d;
     overflow-x: hidden !important;
 }
 
 /* 1. BARRA SUPERIOR (HEADER) */
 .main-header {
-    width: 100% !important; 
-    position: relative !important; 
+    width: 100% !important;
+    position: relative !important;
     top: 0;
     left: 0;
-    z-index: 99999 !important; 
-    height: 80px !important; 
-    border-bottom: 5px solid #d4af37; 
+    z-index: 99999 !important;
+    height: 80px !important;
+    border-bottom: 5px solid #d4af37;
     display: flex;
     align-items: center;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7); 
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7);
     box-sizing: border-box;
+    cursor: pointer;
+    transition: filter 0.3s ease;
+
+    .main-header:hover {
+        /* Efecto de iluminación sutil al pasar el mouse por el logo */
+        filter: brightness(1.1);
+    }
+
+    .top-bar-right {
+        cursor: default;
+    }
 
     /* Graduación de color para el logo */
-    background: linear-gradient(to right, 
-        #ffffff 0%, 
-        #ffffff 40%, 
-        #1a1a1a 80%, 
+    background: linear-gradient(to right,
+        #ffffff 0%,
+        #ffffff 40%,
+        #1a1a1a 80%,
         #0d0d0d 100%) !important;
-    
+
     background-image: url('img/logo-prueba2.png') !important;
-    background-size: auto 110% !important; 
-    background-position: 100px center !important; 
+    background-size: auto 110% !important;
+    background-position: 100px center !important;
     background-repeat: no-repeat !important;
 }
 
 /* 2. CONTENEDOR DE IDENTIDAD (TOP BAR) */
 .top-bar-container {
     display: flex !important;
-    justify-content: flex-end; 
-    align-items: center; 
+    justify-content: flex-end;
+    align-items: center;
     padding: 0 40px;
     width: 100%;
     height: 100%;
-    background: transparent !important; 
+    background: transparent !important;
 }
 
 /* --- CÁPSULA DE USUARIO (CON IMAGEN) --- */
 #user-logged {
     display: flex;
     align-items: center;
-    gap: 12px; 
+    gap: 12px;
     /* Aplicamos la imagen exclusivamente a la cápsula */
     background-image: url('img/fondo-nuevo-grimorio.png') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
-    
+
     padding: 8px 18px;
-    border-radius: 50px; 
+    border-radius: 50px;
     border: 1px solid rgba(212, 175, 55, 0.8) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
     cursor: pointer;
-    position: relative; 
+    position: relative;
     transition: all 0.3s ease;
     z-index: 100001 !important;
 }
@@ -76,9 +88,9 @@ html, body {
 }
 
 #display-name-text {
-    color: #ffffff !important; 
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-    font-family: 'Poppins', sans-serif !important; 
+    color: #ffffff !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    font-family: 'Poppins', sans-serif !important;
     font-weight: 700;
     font-size: 0.95rem;
 }
@@ -95,15 +107,15 @@ html, body {
 /* 3. DROPDOWN MÍSTICO / MICROSOFT STYLE */
 .user-dropdown-menu {
     position: absolute;
-    top: 75px; 
-    right: 0px; 
+    top: 75px;
+    right: 0px;
     width: 320px;
     background: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
     border: 1px solid #e0e0e0;
     padding: 24px;
-    display: none; 
+    display: none;
     flex-direction: column;
     z-index: 100002 !important;
     cursor: default;
@@ -114,36 +126,60 @@ html, body {
     animation: fadeInSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.dropdown-header-ms { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 20px; 
+.dropdown-header-ms {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.btn-cerrar-sesion-ms { 
-    color: #0067b8; 
-    background: none; 
-    border: none; 
-    font-size: 0.9rem; 
-    font-weight: 600; 
-    cursor: pointer; 
-    font-family: 'Poppins', sans-serif; 
+.btn-cerrar-sesion-ms {
+    color: #0067b8;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
 }
 
-.dropdown-body-ms { display: flex; gap: 15px; align-items: flex-start; }
-.avatar-large-ms { width: 80px; height: 80px; border-radius: 50%; border: 1px dashed #adb5bd; padding: 3px; object-fit: cover; }
+.dropdown-body-ms {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
 
-.user-info-ms h4 { margin: 0; font-size: 1.1rem; color: #212529; font-family: 'Poppins', sans-serif; font-weight: 700; }
-.user-info-ms p { margin: 4px 0; font-size: 0.85rem; color: #6c757d; word-break: break-all; }
+.avatar-large-ms {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 1px dashed #adb5bd;
+    padding: 3px;
+    object-fit: cover;
+}
 
-.link-cuenta-ms { 
-    display: inline-block; 
-    margin-top: 10px; 
-    color: #0067b8; 
-    text-decoration: none; 
-    font-size: 0.85rem; 
-    font-weight: 500; 
+.user-info-ms h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #212529;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+}
+
+.user-info-ms p {
+    margin: 4px 0;
+    font-size: 0.85rem;
+    color: #6c757d;
+    word-break: break-all;
+}
+
+.link-cuenta-ms {
+    display: inline-block;
+    margin-top: 10px;
+    color: #0067b8;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
 /* --- 4. BOTÓN ASCENDER (LOGIN) - TRASLÚCIDO CRISTALINO --- */
@@ -151,11 +187,13 @@ html, body {
 #btn-login,
 button#btn-login,
 header .top-bar-right button#btn-login {
-    background-image: none !important; /* ELIMINA CUALQUIER IMAGEN HEREDADA */
-    background-color: rgba(20, 20, 20, 0.5) !important; /* CRISTAL TRASLÚCIDO OSCURO */
+    background-image: none !important;
+    /* ELIMINA CUALQUIER IMAGEN HEREDADA */
+    background-color: rgba(20, 20, 20, 0.5) !important;
+    /* CRISTAL TRASLÚCIDO OSCURO */
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    
+
     border: 2px solid #d4af37 !important;
     color: #d4af37 !important;
     padding: 10px 25px !important;
@@ -193,24 +231,57 @@ button#btn-login:hover {
 .hero-title {
     font-family: 'Cinzel', serif;
     font-size: 3.5rem;
-    color: #ffffff; 
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 2px 2px 10px rgba(0,0,0,0.5);
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 2px 2px 10px rgba(0, 0, 0, 0.5);
     margin: 0 0 20px 0;
     text-align: center;
 }
 
 /* --- ANIMACIONES --- */
-@keyframes fadeInSlide { 
-    from { opacity: 0; transform: translateY(-15px); } 
-    to { opacity: 1; transform: translateY(0); } 
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive */
 @media (max-width: 1100px) {
-    .main-header { 
-        height: 70px !important; 
+    .main-header {
+        height: 70px !important;
         background-size: auto 100% !important;
         background-position: 20px center !important;
     }
-    .hero-title { font-size: 2.2rem; }
+
+    .hero-title {
+        font-size: 2.2rem;
+    }
+}
+
+/* Asegura que el enlace no tenga subrayado y mantenga el puntero de mano */
+.banner-link,
+.banner-logo-link {
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+/* Evita que los títulos cambien de color al ser ahora parte de un enlace */
+.banner-link:hover {
+    filter: brightness(1.2);
+    /* Efecto visual sutil al pasar el mouse */
+    transition: 0.3s ease;
+}
+
+.banner-title-main,
+.banner-subtitle {
+    pointer-events: none;
+    /* Asegura que el click pase al enlace padre */
 }
