@@ -127,22 +127,6 @@ a {
     overflow: hidden;
 }
 
-.sidebar {
-    height: 100vh;
-    position: sticky;
-    top: 0; 
-    z-index: 20;
-    background: rgba(0, 0, 0, 0.6) !important;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(212, 175, 55, 0.3);
-    
-    /* CAMBIO AQUÍ: Añadimos espacio arriba para que no pegue al banner */
-    padding: 50px 25px 25px 25px; 
-    
-    overflow-y: auto;
-}
-
 .top-search-bar {
     margin-bottom: 20px;
     display: flex;
@@ -1116,27 +1100,6 @@ a {
     max-width: 70%;
     /* Evita que el texto choque con los botones */
     
-}
-
-.sidebar select,
-#raza-filter,
-#tipo-filter {
-    width: 100%;
-    background: #121212;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    padding: 10px;
-    font-family: var(--font-main);
-    text-transform: uppercase;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    outline: none;
-}
-
-.sidebar select:hover {
-    border-color: #fff;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
 }
 
 #main-search::placeholder {
