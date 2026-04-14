@@ -128,12 +128,19 @@ a {
 }
 
 .sidebar {
-    width: 300px;
-    background: var(--sidebar-bg);
-    padding: 30px 25px;
-    border-right: 1px solid var(--accent);
+    height: 100vh;
+    position: sticky;
+    top: 0; 
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(212, 175, 55, 0.3);
+    
+    /* CAMBIO AQUÍ: Añadimos espacio arriba para que no pegue al banner */
+    padding: 50px 25px 25px 25px; 
+    
     overflow-y: auto;
-    flex-shrink: 0;
 }
 
 .top-search-bar {

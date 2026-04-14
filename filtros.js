@@ -5,17 +5,17 @@
 // 1. JERARQUÍA COMPLETA (Claves deben coincidir exactamente con Carpeta_Edicion del JSON)
 const jerarquiaCartas = {
     "primera_era": {
-        "El_Reto": null,
-        "Espiritu_de_Dragon": null,
-        "La_ira_del_Nahual": null,
-        "Mundo_Gotico": null,
-        "Ragnarok": null
+        "El_Reto": { razas: ["Caballero", "Dragón", "Faerie"], subs: null },
+        "Espiritu_de_Dragon": { razas: ["Kami", "Campeón", "Xian", "Criatura"], subs: null },
+        "La_ira_del_Nahual": { razas: ["Chamán", "Guerrero", "Bestia"], subs: null },
+        "Mundo_Gotico": { razas: ["Vampiro", "Cazador", "Licántropo"], subs: null },
+        "Ragnarok": { razas: ["Dios", "Abominación", "Bárbaro"], subs: null }
     },
     "primer_bloque": {
-        "Dominios_de_Ra": ["Encrucijada"],
-        "Espada_Sagrada": ["Cruzadas"],
-        "Helenica": ["Imperio"],
-        "Hijos_de_Daana": ["Tierras_Altas"]
+        "Dominios_de_Ra": { razas: ["Eterno", "Faraón", "Sacerdote"], subs: ["Encrucijada"] },
+        "Espada_Sagrada": { razas: ["Caballero", "Dragón", "Faerie"], subs: ["Cruzadas"] },
+        "Helenica": { razas: ["Héroe", "Olímpico", "Titán"], subs: ["Imperio"] },
+        "Hijos_de_Daana": { razas: ["Desafiante", "Defensor", "Sombra"], subs: ["Tierras_Altas"] }
     }
 };
 
@@ -34,7 +34,8 @@ function obtenerRutaImagenGeneral(c) {
 
     for (const era in jerarquiaCartas) {
         for (const edBase in jerarquiaCartas[era]) {
-            const expansiones = jerarquiaCartas[era][edBase];
+            const dataEdicion = jerarquiaCartas[era][edBase];
+            const expansiones = dataEdicion.subs;
             if (expansiones && expansiones.includes(carpeta)) {
                 edicionPadre = edBase; 
                 esExpansion = true;
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', function() {
             actualizarNivelEdiciones(this.value);
             limpiarNivelExpansiones(); 
+            actualizarListaRazas(); // NUEVO: Actualiza razas al cambiar de Era
             ejecutarFiltradoDependiente();
         });
     });
@@ -132,6 +134,7 @@ function gestionarFiltroRaza(tipoSeleccionado) {
 
     if (tipoSeleccionado === 'aliado') {
         if (seccionRaza) seccionRaza.classList.remove('disabled');
+        actualizarListaRazas(); // NUEVO: Refresca el contenido al habilitar
     } else {
         if (seccionRaza) seccionRaza.classList.add('disabled');
         if (razaSelect) razaSelect.value = ""; // Limpiar raza si no es aliado
@@ -166,6 +169,7 @@ function actualizarNivelEdiciones(era) {
         radio.addEventListener('change', function() {
             const eraActiva = document.querySelector('.filter-era:checked').value;
             actualizarNivelExpansiones(eraActiva, this.value);
+            actualizarListaRazas(); // NUEVO: Las razas cambian al seleccionar edición
             ejecutarFiltradoDependiente();
         });
     });
@@ -179,7 +183,8 @@ function actualizarNivelExpansiones(era, edicionNombre) {
     const seccion = document.getElementById('section-expansiones');
     if (!contenedor || !seccion) return;
 
-    const subEdiciones = jerarquiaCartas[era][edicionNombre];
+    const dataEdicion = jerarquiaCartas[era][edicionNombre];
+    const subEdiciones = dataEdicion ? dataEdicion.subs : null;
 
     if (subEdiciones && subEdiciones.length > 0) {
         seccion.classList.remove('disabled');
@@ -197,6 +202,39 @@ function actualizarNivelExpansiones(era, edicionNombre) {
     } else {
         limpiarNivelExpansiones();
     }
+}
+
+/**
+ * ACTUALIZA EL SELECT DE RAZAS SEGÚN EL CONTEXTO (NUEVA FUNCIÓN)
+ */
+function actualizarListaRazas() {
+    const select = document.getElementById('raza-filter');
+    if (!select) return;
+
+    const eraActiva = document.querySelector('.filter-era:checked')?.value;
+    const edActiva = document.querySelector('.filter-ed-principal:checked')?.value;
+    
+    let razasAMostrar = [];
+
+    if (edActiva && eraActiva) {
+        // Caso A: Edición específica seleccionada
+        razasAMostrar = jerarquiaCartas[eraActiva][edActiva].razas;
+    } else if (eraActiva) {
+        // Caso B: Solo Era seleccionada (unir todas las razas de esa Era)
+        const ediciones = jerarquiaCartas[eraActiva];
+        for (let ed in ediciones) {
+            razasAMostrar = [...new Set([...razasAMostrar, ...ediciones[ed].razas])];
+        }
+    }
+
+    // Poblar el select manteniendo la opción "Todas"
+    select.innerHTML = '<option value="">Todas las razas</option>';
+    razasAMostrar.sort().forEach(raza => {
+        const opt = document.createElement('option');
+        opt.value = raza.toLowerCase();
+        opt.textContent = raza;
+        select.appendChild(opt);
+    });
 }
 
 function limpiarNivelExpansiones() {
@@ -243,7 +281,7 @@ function motorDeFiltradoGlobal(listaAFiltrar) {
             if (expansionesActivas.length > 0) {
                 if (!expansionesActivas.includes(carpetaJson)) return false;
             } else {
-                const expansionesPosibles = jerarquiaCartas[bloqueJson][edPrincipalActiva] || [];
+                const expansionesPosibles = jerarquiaCartas[bloqueJson][edPrincipalActiva].subs || [];
                 if (carpetaJson !== edPrincipalActiva && !expansionesPosibles.includes(carpetaJson)) return false;
             }
         }
@@ -280,7 +318,10 @@ function limpiarFiltrosInterfaz() {
     
     document.querySelectorAll('.sidebar input[type="radio"], .sidebar input[type="checkbox"]').forEach(i => i.checked = false);
     
-    if (document.getElementById('raza-filter')) document.getElementById('raza-filter').value = "";
+    if (document.getElementById('raza-filter')) {
+        document.getElementById('raza-filter').innerHTML = '<option value="">Todas las razas</option>';
+        document.getElementById('raza-filter').value = "";
+    }
     
     const filterCoste = document.getElementById('filter-coste');
     const filterFuerza = document.getElementById('filter-fuerza');

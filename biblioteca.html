@@ -5,332 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grimorio MyL - Biblioteca de Crónicas</title>
-    
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="banner.css?v=1102">
-    
+    <link rel="stylesheet" href="biblioteca.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    <style>
-        /* --- AJUSTE DE LAYOUT PARA FONDO DE IMAGEN --- */
-        
-        body.body-biblioteca {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), 
-                              url('img/fondo-nuevo-grimorio.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            display: block; 
-            min-height: 100vh;
-        }
-
-        .main-layout {
-            margin-top: 0 !important; 
-            min-height: 100vh;
-            display: flex;
-            background: transparent; 
-            position: relative;
-            z-index: 10;
-        }
-
-        .sidebar {
-            height: 100vh;
-            position: sticky;
-            top: 0; 
-            z-index: 20;
-            background: rgba(0, 0, 0, 0.6) !important;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(212, 175, 55, 0.3);
-            padding: 15px 25px 25px 25px;
-            overflow-y: auto;
-        }
-
-        /* Estilos para Cascada de Filtros */
-        .filter-group.disabled {
-            opacity: 0.3;
-            pointer-events: none;
-            filter: grayscale(1);
-            transition: all 0.4s ease;
-        }
-
-        .placeholder-text {
-            font-size: 0.75rem;
-            color: #888;
-            font-style: italic;
-            padding: 10px 0;
-        }
-
-        /* --- ESTILO PARA BOTÓN DE LIMPIEZA PEQUEÑO SUPERIOR --- */
-        .btn-místico-sm {
-            display: block;
-            width: auto;
-            max-width: fit-content;
-            margin: 0 auto 20px auto;
-            background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
-            color: #d4af37;
-            border: 1px solid #d4af37;
-            padding: 6px 15px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 4px;
-            cursor: pointer;
-            box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .btn-místico-sm:hover {
-            background: linear-gradient(to bottom, #d4af37, #b8860b);
-            color: #1a1a1a;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
-            transform: translateY(-1px);
-        }
-
-        #main-search {
-            width: 100%;
-            padding-right: 45px !important;
-            background: white !important;
-            color: black !important;
-            border: 2px solid #d4af37;
-            font-weight: 700;
-            border-radius: 4px;
-        }
-
-        .btn-dorado-santuario {
-            background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
-            color: #000 !important;
-            border: 1px solid #fff !important;
-            padding: 10px 20px !important;
-            font-family: 'Cinzel', serif !important;
-            font-weight: bold !important;
-            font-size: 0.8rem !important;
-            cursor: pointer;
-            border-radius: 4px !important;
-            min-width: 220px;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-
-        .detail-panel {
-            z-index: 999999 !important;
-        }
-
-        #close-detail {
-            all: unset;
-            position: absolute !important;
-            top: 15px !important;
-            right: 15px !important;
-            width: 38px !important;
-            height: 38px !important;
-            border-radius: 50% !important;
-            background: #d4af37 !important;
-            border: 2px solid #000 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: #000 !important;
-            font-size: 22px !important;
-            font-weight: bold !important;
-            cursor: pointer !important;
-            z-index: 2100 !important;
-        }
-
-        .btn-folder-add {
-            flex: 1 !important;
-            background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
-            color: #000 !important;
-            border: 1px solid #fff !important;
-            padding: 12px 5px !important;
-            font-family: 'Cinzel', serif !important;
-            font-weight: 900 !important;
-            font-size: 0.75rem !important;
-            cursor: pointer;
-            text-transform: uppercase;
-            border-radius: 4px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: 0.3s ease;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 5px !important;
-        }
-
-        .btn-folder-add:hover {
-            background: #fff !important;
-            box-shadow: 0 0 15px #d4af37;
-            transform: translateY(-2px);
-        }
-
-        .folder-actions-row {
-            display: flex !important;
-            flex-direction: row !important;
-            gap: 10px;
-            margin-top: 15px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        #toast-container {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .toast {
-            background: rgba(10, 10, 10, 0.95);
-            color: #d4af37;
-            border: 1px solid #d4af37;
-            padding: 12px 25px;
-            border-radius: 4px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            animation: fadeInToast 0.4s ease forwards;
-            backdrop-filter: blur(5px);
-            pointer-events: auto;
-        }
-
-        @keyframes fadeInToast {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .toast.fade-out {
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: 0.5s ease;
-        }
-
-        #btn-login, #user-logged {
-            display: none !important;
-            opacity: 0;
-        }
-
-        #user-logged.auth-ready {
-            display: flex !important;
-            opacity: 1 !important;
-        }
-
-        #btn-login.auth-ready {
-            display: inline-block !important;
-            opacity: 1 !important;
-        }
-    </style>
 </head>
 
 <body class="body-biblioteca">
-
-     <style>
-        /* FONDO DINÁMICO DEL PORTAL */
-        body.body-santuario {
-            margin: 0;
-            padding: 0;
-            background:
-                linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)),
-                url('img/fondo-nuevo-grimorio.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-        }
-
-        /* Blindaje de Interfaz (Oculto hasta que Auth responda) */
-        #btn-login, #user-logged {
-            display: none !important;
-            opacity: 0;
-        }
-
-        /* REVELACIÓN FORZADA POR JS */
-        #user-logged.auth-ready {
-            display: flex !important;
-            opacity: 1 !important;
-        }
-
-        #btn-login.auth-ready {
-            display: inline-block !important;
-            opacity: 1 !important;
-        }
-
-        /* --- 1. AISLAMIENTO DE LA CÁPSULA (CON IMAGEN) --- */
-        html body #user-logged {
-            position: relative !important;
-            z-index: 9999 !important;
-            cursor: pointer !important;
-            /* IMAGEN OBLIGATORIA AQUÍ */
-            background-image: url('img/fondo-nuevo-grimorio.png') !important;
-            background-size: cover !important;
-            background-position: center !important;
-            border-radius: 50px !important;
-            border: 1px solid rgba(212, 175, 55, 0.8) !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
-            padding: 8px 18px;
-            transition: all 0.3s ease !important;
-        }
-
-        #display-name-text {
-            color: #ffffff !important;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-        }
-
-        /* --- 2. AISLAMIENTO DEL BOTÓN (CRISTAL TRASLÚCIDO) --- */
-        /* Bloqueamos cualquier imagen heredada de banner.css o portal.css */
-        html body button#btn-login {
-            background-image: none !important; /* ELIMINA LA IMAGEN DEFINITIVAMENTE */
-            background-color: rgba(255, 255, 255, 0.1) !important; /* TRASLUCIDEZ */
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
-            border: 2px solid #d4af37 !important;
-            color: #d4af37 !important;
-            padding: 10px 25px !important;
-            font-family: 'Cinzel', serif !important;
-            font-weight: 700 !important;
-            border-radius: 4px !important;
-            text-transform: uppercase !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        html body button#btn-login:hover {
-            background-color: rgba(212, 175, 55, 0.2) !important;
-            color: #ffffff !important;
-            border-color: #ffffff !important;
-        }
-
-        /* Dropdown Menú */
-        #user-dropdown {
-            z-index: 10000 !important;
-            display: none;
-            position: absolute;
-            top: 110%;
-            right: 0;
-            cursor: default;
-        }
-        #user-dropdown.active { display: flex !important; }
-
-        .main-header { position: relative; z-index: 10001; }
-        .hero-block { pointer-events: none; margin-bottom: 20px; }
-        .hero-title { pointer-events: auto; }
-    </style>
-</head>
-
-<body class="body-santuario">
 
     <header class="main-header">
         <div class="top-bar-container">
@@ -350,8 +33,7 @@
                         </div>
 
                         <div class="dropdown-body-ms">
-                            <img id="user-photo-large" class="avatar-large-ms" src="img/avatar-default.png"
-                                alt="Avatar">
+                            <img id="user-photo-large" class="avatar-large-ms" src="img/avatar-default.png" alt="Avatar">
                             <div class="user-info-ms">
                                 <h4 id="user-full-name">Gladiador</h4>
                                 <p id="user-email">...</p>
@@ -403,7 +85,7 @@
 
             <section class="filter-group disabled" id="section-raza">
                 <h3>RAZA</h3>
-                <select id="raza-filter" class="form-control" style="width: 100%; background: rgba(255,255,255,0.1); color: white; border: 1px solid #d4af37; padding: 5px; border-radius: 4px;">
+                <select id="raza-filter" class="form-control-místico">
                     <option value="">Todas las razas</option>
                     <option value="caballero">Caballero</option>
                     <option value="dragon">Dragón</option>
@@ -415,18 +97,6 @@
                     <option value="bestia">Bestia</option>
                 </select>
             </section>
-
-            <section class="filter-group">
-                <h3>ESTADÍSTICAS</h3>
-                <div class="range-container">
-                    <label>Coste Máx: <span id="val-coste">10</span></label>
-                    <input type="range" id="filter-coste" min="0" max="10" value="10">
-                </div>
-                <div class="range-container">
-                    <label>Fuerza Mín: <span id="val-fuerza">0</span></label>
-                    <input type="range" id="filter-fuerza" min="0" max="12" value="0">
-                </div>
-            </section>
         </aside>
 
         <main class="content">
@@ -437,7 +107,7 @@
                         <button id="btn-clear-search" title="Limpiar búsqueda">×</button>
                     </div>
                     <div id="contenedor-boton-santuario">
-                        <button class="btn-dorado-santuario" onclick="location.href='index.html'">VOLVER AL PORTAL</button>
+                        <button class="btn-dorado-santuario" onclick="location.href='grimorio.html'">VOLVER A MI GRIMORIO</button>
                     </div>
                 </div>
             </div>
