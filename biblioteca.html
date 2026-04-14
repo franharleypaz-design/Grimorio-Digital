@@ -234,8 +234,108 @@
 
 <body class="body-biblioteca">
 
+     <style>
+        /* FONDO DINÁMICO DEL PORTAL */
+        body.body-santuario {
+            margin: 0;
+            padding: 0;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)),
+                url('img/fondo-nuevo-grimorio.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        /* Blindaje de Interfaz (Oculto hasta que Auth responda) */
+        #btn-login, #user-logged {
+            display: none !important;
+            opacity: 0;
+        }
+
+        /* REVELACIÓN FORZADA POR JS */
+        #user-logged.auth-ready {
+            display: flex !important;
+            opacity: 1 !important;
+        }
+
+        #btn-login.auth-ready {
+            display: inline-block !important;
+            opacity: 1 !important;
+        }
+
+        /* --- 1. AISLAMIENTO DE LA CÁPSULA (CON IMAGEN) --- */
+        html body #user-logged {
+            position: relative !important;
+            z-index: 9999 !important;
+            cursor: pointer !important;
+            /* IMAGEN OBLIGATORIA AQUÍ */
+            background-image: url('img/fondo-nuevo-grimorio.png') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            border-radius: 50px !important;
+            border: 1px solid rgba(212, 175, 55, 0.8) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+            padding: 8px 18px;
+            transition: all 0.3s ease !important;
+        }
+
+        #display-name-text {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+
+        /* --- 2. AISLAMIENTO DEL BOTÓN (CRISTAL TRASLÚCIDO) --- */
+        /* Bloqueamos cualquier imagen heredada de banner.css o portal.css */
+        html body button#btn-login {
+            background-image: none !important; /* ELIMINA LA IMAGEN DEFINITIVAMENTE */
+            background-color: rgba(255, 255, 255, 0.1) !important; /* TRASLUCIDEZ */
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 2px solid #d4af37 !important;
+            color: #d4af37 !important;
+            padding: 10px 25px !important;
+            font-family: 'Cinzel', serif !important;
+            font-weight: 700 !important;
+            border-radius: 4px !important;
+            text-transform: uppercase !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        html body button#btn-login:hover {
+            background-color: rgba(212, 175, 55, 0.2) !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+        }
+
+        /* Dropdown Menú */
+        #user-dropdown {
+            z-index: 10000 !important;
+            display: none;
+            position: absolute;
+            top: 110%;
+            right: 0;
+            cursor: default;
+        }
+        #user-dropdown.active { display: flex !important; }
+
+        .main-header { position: relative; z-index: 10001; }
+        .hero-block { pointer-events: none; margin-bottom: 20px; }
+        .hero-title { pointer-events: auto; }
+    </style>
+</head>
+
+<body class="body-santuario">
+
     <header class="main-header">
         <div class="top-bar-container">
+            <div class="top-bar-left"></div>
+
             <div class="top-bar-right">
                 <button id="btn-login" class="btn-místico">ASCENDER</button>
 
@@ -250,7 +350,8 @@
                         </div>
 
                         <div class="dropdown-body-ms">
-                            <img id="user-photo-large" class="avatar-large-ms" src="img/avatar-default.png" alt="Avatar">
+                            <img id="user-photo-large" class="avatar-large-ms" src="img/avatar-default.png"
+                                alt="Avatar">
                             <div class="user-info-ms">
                                 <h4 id="user-full-name">Gladiador</h4>
                                 <p id="user-email">...</p>

@@ -1,19 +1,123 @@
 // ==========================================
-// GRIMORIO.JS - SISTEMA DE SELLOS MÍSTICOS (MODAL Y LÍMITE INCLUIDO)
+// GRIMORIO.JS - SISTEMA DE SELLOS MÍSTICOS (NOTIFICACIONES INTEGRADAS)
 // ==========================================
 
 let slotParaRenombrar = null; // Variable temporal para el modal
 
+// --- FUNCIÓN DE NOTIFICACIÓN ESTILO BIBLIOTECA (POSICIÓN CENTRADA INFERIOR) ---
+function mostrarNotificacion(mensaje, icono = "✨") {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    // Limpiar notificaciones anteriores para que no se amontonen (estilo biblioteca)
+    container.innerHTML = "";
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-msg';
+    
+    // Estilos exactos para posición central inferior y estética mística
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 10, 10, 0.95);
+        border: 1px solid #d4af37;
+        color: #d4af37;
+        padding: 15px 35px;
+        border-radius: 6px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(212, 175, 55, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 100000;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        animation: toastFadeIn 0.4s ease-out forwards;
+        white-space: nowrap;
+    `;
+
+    toast.innerHTML = `<span style="color:#d4af37; font-size: 1.1rem;">${icono}</span> ${mensaje}`;
+    container.appendChild(toast);
+
+    // Desvanecer y eliminar
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = '0.5s';
+        setTimeout(() => toast.remove(), 500);
+    }, 2500);
+}
+
+// Inyectar animaciones necesarias al documento si no existen
+if (!document.getElementById('toast-animations')) {
+    const styleSheet = document.createElement("style");
+    styleSheet.id = 'toast-animations';
+    styleSheet.innerText = `
+        @keyframes toastFadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+}
+
+// 1. OBSERVADOR DE SESIÓN (SOLUCIONA EL BOTÓN DE PERFIL EN EL SANTUARIO)
 auth.onAuthStateChanged(user => {
     if (user) {
         usuarioActual = user;
+        console.log("Invocador en el Santuario:", user.uid);
+        
+        // Activar Interfaz Superior (Cápsula de usuario)
+        gestionarInterfazLogueadoGrimorio(user);
+        
         cargarSlotsSantuario();
         const btnImportar = document.getElementById('btn-copiar-id');
         if (btnImportar) btnImportar.onclick = copiarMazoPorID;
+    } else {
+        // Si no hay sesión, mostramos botón ASCENDER
+        if (document.getElementById('btn-login')) document.getElementById('btn-login').style.display = 'block';
+        if (document.getElementById('user-logged')) document.getElementById('user-logged').style.display = 'none';
     }
 });
 
-// 1. CARGAR DATOS
+// Función para forzar la aparición de la cápsula superior y cargar fotos
+async function gestionarInterfazLogueadoGrimorio(user) {
+    const btnLogin = document.getElementById('btn-login');
+    const userLogged = document.getElementById('user-logged');
+    const displayNameText = document.getElementById('display-name-text');
+    const userPhoto = document.getElementById('user-photo');
+
+    if (btnLogin) btnLogin.style.display = 'none';
+    if (userLogged) {
+        userLogged.style.display = 'flex';
+        if (displayNameText) {
+            displayNameText.innerText = user.displayName || "Invocador";
+        }
+    }
+
+    // Cargar foto custom desde Firestore para la cápsula
+    try {
+        const doc = await db.collection('usuarios').get(); // Se asume búsqueda por UID en implementación real
+        // Nota: Se mantiene lógica simplificada de tu código original
+        const userDoc = await db.collection('usuarios').doc(user.uid).get();
+        if (userDoc.exists && userDoc.data().photoCustom) {
+            const url = userDoc.data().photoCustom;
+            if (userPhoto) userPhoto.src = url;
+            const photoDropdown = document.getElementById('user-photo-large-dropdown');
+            if (photoDropdown) photoDropdown.src = url;
+            const userFullName = document.getElementById('user-full-name');
+            if (userFullName) userFullName.innerText = userDoc.data().nickname || user.displayName || "Invocador";
+        }
+    } catch (e) { console.error("Error cargando foto en cápsula:", e); }
+}
+
+// 2. CARGAR DATOS DE SLOTS
 async function cargarSlotsSantuario() {
     if (!usuarioActual) return;
     try {
@@ -126,7 +230,7 @@ function inyectarSlotCopiado(id, data) {
     grid.appendChild(div);
 }
 
-// 2. ACCIÓN: COMPARTIR
+// 3. ACCIÓN: COMPARTIR
 function copiarIDAlPortapapeles(id, el) {
     if (!usuarioActual) return;
     
@@ -170,13 +274,13 @@ function copiarMetodoFallback(texto, el) {
 }
 
 function ejecutarFeedbackCopiado(el, sello) {
-    mostrarNotificacion(`📜 SELLO [${sello}] COPIADO`, "✨");
+    mostrarNotificacion(`SELLO [${sello}] COPIADO`, "📜");
     const iconoOriginal = el.innerText;
     el.innerText = "✅";
     setTimeout(() => { el.innerText = iconoOriginal; }, 2000);
 }
 
-// 3. ACCIÓN: IMPORTAR
+// 4. ACCIÓN: IMPORTAR
 async function copiarMazoPorID() {
     const input = document.getElementById('input-copiar-id');
     const btn = document.getElementById('btn-copiar-id'); 
@@ -250,7 +354,7 @@ async function copiarMazoPorID() {
             fechaCopia: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        mostrarNotificacion("✨ ¡ESTRATEGIA HEREDADA!", "✨");
+        mostrarNotificacion("¡ESTRATEGIA HEREDADA!", "✨");
         if (btn) btn.innerText = "MAZO COPIADO";
         if (input) input.value = "";
         setTimeout(() => { location.reload(); }, 1500);
@@ -261,7 +365,7 @@ async function copiarMazoPorID() {
     }
 }
 
-// 4. LÓGICA DE RENOMBRADO (MODAL PERSONALIZADO)
+// 5. LÓGICA DE RENOMBRADO (MODAL PERSONALIZADO)
 function renombrarSlot(id) {
     slotParaRenombrar = id;
     const modal = document.getElementById('modal-renombrar');
@@ -310,12 +414,12 @@ async function ejecutarRenombrado() {
     }
 }
 
-// GESTIÓN
+// GESTIÓN Y BORRADO
 async function borrarCopia(id) {
     if (!confirm("¿Desterrar mazo?")) return;
     try {
         await db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(id).delete();
-        mostrarNotificacion("Mazo desterrado.", "🗑️");
+        mostrarNotificacion("MAZO DESTERRADO", "🗑️");
         cargarSlotsSantuario();
     } catch (e) { console.error(e); }
 }
@@ -326,6 +430,7 @@ async function limpiarSlot(id) {
         await db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(id).set({
             cartas: [], nombre: getDefaultName(id)
         }, { merge: true });
+        mostrarNotificacion("REGISTRO VACIADO", "🧹");
         cargarSlotsSantuario();
     } catch (e) { console.error(e); }
 }

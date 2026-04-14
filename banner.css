@@ -53,14 +53,14 @@ html, body {
 #user-logged {
     display: flex;
     align-items: center;
-    gap: 10px; /* Reducido para dar espacio al avatar */
+    gap: 12px; 
     /* Aplicamos la imagen exclusivamente a la cápsula */
     background-image: url('img/fondo-nuevo-grimorio.png') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
     
-    padding: 6px 18px 6px 8px; /* Reducido padding lateral para balancear el avatar */
+    padding: 8px 18px;
     border-radius: 50px; 
     border: 1px solid rgba(212, 175, 55, 0.8) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
@@ -75,19 +75,17 @@ html, body {
     box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
 }
 
-/* NOMBRE ACHICADO */
 #display-name-text {
     color: #ffffff !important; 
     text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
     font-family: 'Poppins', sans-serif !important; 
     font-weight: 700;
-    font-size: 0.8rem; /* Achicado de 0.95rem */
+    font-size: 0.95rem;
 }
 
-/* AVATAR AGRANDADO */
 .avatar-header {
-    width: 50px !important; /* Agrandado de 42px */
-    height: 50px !important; /* Agrandado de 42px */
+    width: 42px !important;
+    height: 42px !important;
     border: 2px solid #d4af37 !important;
     border-radius: 50%;
     object-fit: cover;
@@ -149,11 +147,12 @@ html, body {
 }
 
 /* --- 4. BOTÓN ASCENDER (LOGIN) - TRASLÚCIDO CRISTALINO --- */
+/* Bloqueamos cualquier imagen para que el fondo de la web sea visible a través del botón */
 #btn-login,
 button#btn-login,
 header .top-bar-right button#btn-login {
-    background-image: none !important; 
-    background-color: rgba(20, 20, 20, 0.5) !important; 
+    background-image: none !important; /* ELIMINA CUALQUIER IMAGEN HEREDADA */
+    background-color: rgba(20, 20, 20, 0.5) !important; /* CRISTAL TRASLÚCIDO OSCURO */
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     

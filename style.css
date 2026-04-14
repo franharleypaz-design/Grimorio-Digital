@@ -1078,24 +1078,6 @@ a {
     }
 }
 
-/* Asegurar que la página del grimorio permita scroll */
-.body-grimorio {
-    height: auto !important;
-    /* Permite que la altura sea dinámica */
-    min-height: 100vh;
-    overflow-y: auto !important;
-    /* Fuerza la aparición del scroll vertical */
-    display: block;
-    /* Evita conflictos con flexbox si estaba activado */
-}
-
-/* El contenedor principal también debe permitir scroll */
-.content-grimorio {
-    overflow: visible !important;
-    padding-bottom: 50px;
-    /* Espacio extra al final para que no choque con el borde */
-}
-
 /* Estilo para los títulos de mazos adquiridos (reemplaza el azul feo) */
 .item-copiado .slot-name {
     color: #ffffff !important;
