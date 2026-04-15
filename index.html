@@ -50,7 +50,6 @@
             position: relative !important;
             z-index: 9999 !important;
             cursor: pointer !important;
-            /* IMAGEN OBLIGATORIA AQUÍ */
             background-image: url('img/fondo-nuevo-grimorio.png') !important;
             background-size: cover !important;
             background-position: center !important;
@@ -69,10 +68,9 @@
         }
 
         /* --- 2. AISLAMIENTO DEL BOTÓN (CRISTAL TRASLÚCIDO) --- */
-        /* Bloqueamos cualquier imagen heredada de banner.css o portal.css */
         html body button#btn-login {
-            background-image: none !important; /* ELIMINA LA IMAGEN DEFINITIVAMENTE */
-            background-color: rgba(255, 255, 255, 0.1) !important; /* TRASLUCIDEZ */
+            background-image: none !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px) !important;
             -webkit-backdrop-filter: blur(10px) !important;
             border: 2px solid #d4af37 !important;
@@ -103,7 +101,10 @@
         }
         #user-dropdown.active { display: flex !important; }
 
-        .main-header { position: relative; z-index: 10001; }
+        /* AJUSTE DE CAPAS PARA EL HEADER CLICABLE */
+        .main-header { position: relative; z-index: 10001; cursor: pointer; }
+        .top-bar-right { position: relative; z-index: 20000 !important; cursor: default; }
+        
         .hero-block { pointer-events: none; margin-bottom: 20px; }
         .hero-title { pointer-events: auto; }
     </style>
@@ -115,7 +116,7 @@
         <div class="top-bar-container">
             <div class="top-bar-left"></div>
 
-            <div class="top-bar-right">
+            <div class="top-bar-right" onclick="event.stopPropagation();">
                 <button id="btn-login" class="btn-místico">ASCENDER</button>
 
                 <div id="user-logged">
