@@ -11,15 +11,60 @@
     <link rel="stylesheet" href="biblioteca.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 1. BLINDAJE DE CARGA: Escondemos todo por defecto */
+        #btn-login, #user-logged {
+            display: none !important;
+            opacity: 0;
+        }
+
+        /* 2. REVELACIÓN: Solo el JS activará estas clases */
+        #btn-login.auth-ready {
+            display: inline-block !important;
+            opacity: 1 !important;
+        }
+
+        #user-logged.auth-ready {
+            display: flex !important;
+            opacity: 1 !important;
+        }
+
+        /* AJUSTE DE CAPAS Y POSICIÓN DEL LOGO */
+        .main-header { position: relative; z-index: 10001; cursor: default; }
+        .top-bar-left { position: relative; height: 100%; flex: 1; }
+        
+        .logo-click-area {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 80px; 
+            width: 300px; 
+            height: 80px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .top-bar-right { 
+            position: relative; 
+            z-index: 20000 !important; 
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
 </head>
 
 <body class="body-biblioteca">
 
-    <header class="main-header" onclick="location.href='index.html'">
+    <header class="main-header">
         <div class="top-bar-container">
-            <div class="top-bar-left"></div>
+            <div class="top-bar-left">
+                <a href="index.html" class="logo-click-area" title="Volver al Inicio"></a>
+            </div>
 
-            <div class="top-bar-right">
+            <div class="top-bar-right" onclick="event.stopPropagation();">
                 <button id="btn-login" class="btn-místico">ASCENDER</button>
 
                 <div id="user-logged">

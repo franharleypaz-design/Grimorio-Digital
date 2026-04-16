@@ -25,17 +25,10 @@ body {
     align-items: center;
     box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7);
     box-sizing: border-box;
-    cursor: pointer;
+    
+    /* INTERACCIÓN DE ENLACE */
+    cursor: default; /* Cambiado a default para que solo el logo tenga el puntero */
     transition: filter 0.3s ease;
-
-    .main-header:hover {
-        /* Efecto de iluminación sutil al pasar el mouse por el logo */
-        filter: brightness(1.1);
-    }
-
-    .top-bar-right {
-        cursor: default;
-    }
 
     /* Graduación de color para el logo */
     background: linear-gradient(to right,
@@ -50,15 +43,49 @@ body {
     background-repeat: no-repeat !important;
 }
 
+/* Efecto de iluminación al pasar el mouse por el logo/header */
+.main-header:hover {
+    filter: brightness(1.05);
+}
+
 /* 2. CONTENEDOR DE IDENTIDAD (TOP BAR) */
 .top-bar-container {
     display: flex !important;
-    justify-content: flex-end;
+    justify-content: space-between; /* Cambiado para separar logo de botones */
     align-items: center;
     padding: 0 40px;
     width: 100%;
     height: 100%;
     background: transparent !important;
+    position: relative;
+}
+
+/* ÁREA DE CLIC DEL LOGO (Posicionamiento Absoluto sobre la imagen) */
+.top-bar-left {
+    position: relative;
+    height: 100%;
+    width: 350px; /* Área que cubre el logo */
+}
+
+.logo-click-area {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 60px; /* Ajuste para calzar con background-position: 100px */
+    width: 280px; 
+    height: 100%;
+    cursor: pointer;
+    z-index: 100;
+}
+
+/* PROTECCIÓN DE INTERACCIÓN: Evita que el cursor de link del header afecte los botones */
+.top-bar-right {
+    cursor: default;
+    position: relative;
+    z-index: 100001;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 /* --- CÁPSULA DE USUARIO (CON IMAGEN) --- */
@@ -66,7 +93,6 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    /* Aplicamos la imagen exclusivamente a la cápsula */
     background-image: url('img/fondo-nuevo-grimorio.png') !important;
     background-size: cover !important;
     background-position: center !important;
@@ -79,7 +105,6 @@ body {
     cursor: pointer;
     position: relative;
     transition: all 0.3s ease;
-    z-index: 100001 !important;
 }
 
 #user-logged:hover {
@@ -182,18 +207,13 @@ body {
     font-weight: 500;
 }
 
-/* --- 4. BOTÓN ASCENDER (LOGIN) - TRASLÚCIDO CRISTALINO --- */
-/* Bloqueamos cualquier imagen para que el fondo de la web sea visible a través del botón */
+/* --- 4. BOTÓN ASCENDER (LOGIN) --- */
 #btn-login,
-button#btn-login,
-header .top-bar-right button#btn-login {
+button#btn-login {
     background-image: none !important;
-    /* ELIMINA CUALQUIER IMAGEN HEREDADA */
     background-color: rgba(20, 20, 20, 0.5) !important;
-    /* CRISTAL TRASLÚCIDO OSCURO */
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-
     border: 2px solid #d4af37 !important;
     color: #d4af37 !important;
     padding: 10px 25px !important;
@@ -204,13 +224,11 @@ header .top-bar-right button#btn-login {
     text-transform: uppercase !important;
     cursor: pointer !important;
     transition: all 0.4s ease !important;
-    text-shadow: none !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
 }
 
 #btn-login:hover,
 button#btn-login:hover {
-    background-image: none !important;
     background-color: rgba(212, 175, 55, 0.2) !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
@@ -218,7 +236,7 @@ button#btn-login:hover {
     transform: translateY(-2px) !important;
 }
 
-/* 5. GRID PORTAL INDEX */
+/* 5. PORTAL ESTRUCTURA */
 .portal-grid-layout {
     display: flex;
     flex-direction: column;
@@ -239,15 +257,8 @@ button#btn-login:hover {
 
 /* --- ANIMACIONES --- */
 @keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive */
@@ -257,15 +268,12 @@ button#btn-login:hover {
         background-size: auto 100% !important;
         background-position: 20px center !important;
     }
-
-    .hero-title {
-        font-size: 2.2rem;
-    }
+    .hero-title { font-size: 2.2rem; }
+    .logo-click-area { left: 10px; width: 200px; }
 }
 
-/* Asegura que el enlace no tenga subrayado y mantenga el puntero de mano */
-.banner-link,
-.banner-logo-link {
+/* UTILITARIOS DE ENLACE */
+.banner-link, .banner-logo-link {
     text-decoration: none;
     display: block;
     cursor: pointer;
@@ -273,15 +281,6 @@ button#btn-login:hover {
     height: 100%;
 }
 
-/* Evita que los títulos cambien de color al ser ahora parte de un enlace */
-.banner-link:hover {
-    filter: brightness(1.2);
-    /* Efecto visual sutil al pasar el mouse */
-    transition: 0.3s ease;
-}
-
-.banner-title-main,
-.banner-subtitle {
+.banner-title-main, .banner-subtitle {
     pointer-events: none;
-    /* Asegura que el click pase al enlace padre */
 }

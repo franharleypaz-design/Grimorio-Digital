@@ -10,7 +10,9 @@ const firebaseConfig = {
     appId: "1:1093812970594:web:60831d9139b37c7858dd3b"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -41,24 +43,26 @@ async function cargarGrimorio() {
 }
 
 // ==========================================
-// 4. GESTIÓN DE SESIÓN (AUTH)
+// 4. GESTIÓN DE SESIÓN (AUTH) - OPTIMIZADA
 // ==========================================
 auth.onAuthStateChanged(async user => {
     const loginBtn = document.getElementById('btn-login');
     const userSection = document.getElementById('user-logged');
     const contenedorBoton = document.getElementById('contenedor-boton-santuario');
     
+    // Rutas
     const rutasPrivadas = ['perfil.html', 'grimorio.html', 'constructor.html'];
     const esRutaPrivada = rutasPrivadas.some(p => window.location.pathname.includes(p));
+
+    // Limpieza inicial de clases para evitar duplicados
+    if (loginBtn) loginBtn.classList.remove('auth-ready');
+    if (userSection) userSection.classList.remove('auth-ready');
 
     if (user) {
         usuarioActual = user;
         
-        // 1. Ocultar login (eliminar clase de visibilidad y forzar display none)
-        if (loginBtn) {
-            loginBtn.classList.remove('auth-ready');
-            loginBtn.style.setProperty('display', 'none', 'important');
-        }
+        // 1. Ocultar login definitivamente
+        if (loginBtn) loginBtn.style.display = 'none';
         
         // 2. Elementos de UI
         const nameHeader = document.getElementById('display-name-text');
@@ -67,7 +71,7 @@ auth.onAuthStateChanged(async user => {
         const photoSmall = document.getElementById('user-photo');
         const photoLarge = document.getElementById('user-photo-large');
 
-        // 3. Carga inicial desde Google
+        // 3. Carga rápida (Datos de Google)
         if (nameHeader) nameHeader.innerText = user.displayName || "Gladiador";
         if (fullNameMenu) fullNameMenu.innerText = user.displayName || "Gladiador";
         if (emailMenu) emailMenu.innerText = user.email;
@@ -82,7 +86,8 @@ auth.onAuthStateChanged(async user => {
         }
 
         // 4. Sincronización con Firestore (Datos Personalizados)
-        db.collection('usuarios').doc(user.uid).get().then(doc => {
+        try {
+            const doc = await db.collection('usuarios').doc(user.uid).get();
             if (doc.exists) {
                 const data = doc.data();
                 if (data.nickname && nameHeader) nameHeader.innerText = data.nickname;
@@ -92,9 +97,10 @@ auth.onAuthStateChanged(async user => {
                     if (photoLarge) photoLarge.src = data.photoCustom;
                 }
             }
-            // 5. Revelar interfaz de usuario logueado
-            if (userSection) userSection.classList.add('auth-ready');
-        });
+        } catch (e) { console.warn("Error cargando perfil extendido:", e); }
+
+        // 5. REVELAR interfaz de usuario logueado
+        if (userSection) userSection.classList.add('auth-ready');
 
         if (window.location.pathname.includes('perfil.html')) {
             cargarTarjetaInvocador(user.uid);
@@ -102,13 +108,12 @@ auth.onAuthStateChanged(async user => {
     } else {
         usuarioActual = null;
         if (contenedorBoton) contenedorBoton.innerHTML = "";
-        if (userSection) userSection.classList.remove('auth-ready');
         
         if (esRutaPrivada) {
             window.location.href = 'index.html';
         } else {
             if (loginBtn) {
-                // Forzar la visibilidad del botón estilizado
+                loginBtn.style.display = 'inline-block';
                 loginBtn.classList.add('auth-ready');
                 loginBtn.onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
             }
@@ -120,13 +125,15 @@ auth.onAuthStateChanged(async user => {
 // 5. FUNCIONES DE CARPETAS (FIREBASE)
 // ==========================================
 async function añadirACarpetaLibre(cartaId, carpetaSlot, nombreCarpeta) {
-    if (!usuarioActual) return;
+    if (!usuarioActual) {
+        mostrarToast("Debes ascender primero", "🔒");
+        return;
+    }
     const docRef = db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(carpetaSlot);
 
     try {
         const doc = await docRef.get();
-        let data = doc.exists ? doc.data() : { nombre: "", cartas: [] };
-        let lista = data.cartas || [];
+        let lista = doc.exists ? (doc.data().cartas || []) : [];
         const index = lista.findIndex(item => item.id === cartaId);
 
         if (index > -1) {
@@ -138,7 +145,7 @@ async function añadirACarpetaLibre(cartaId, carpetaSlot, nombreCarpeta) {
         await docRef.set({ cartas: lista }, { merge: true });
         mostrarToast(`Inscrita en ${nombreCarpeta}`, "✨");
     } catch (e) {
-        console.error("Error al guardar en carpeta:", e);
+        console.error("Error al guardar:", e);
         mostrarToast("Fallo en la conexión astral", "❌");
     }
 }
@@ -147,27 +154,32 @@ async function añadirACarpetaLibre(cartaId, carpetaSlot, nombreCarpeta) {
 // 6. PERFIL Y UTILIDADES
 // ==========================================
 async function cargarTarjetaInvocador(uid) {
-    const doc = await db.collection('usuarios').doc(uid).get();
-    if (doc.exists) {
-        const data = doc.data();
-        const nicknameFinal = data.nickname || "GLADIADOR";
-        if (document.getElementById('card-nick-display')) document.getElementById('card-nick-display').innerText = nicknameFinal;
-        if (document.getElementById('card-desc-display')) document.getElementById('card-desc-display').innerText = data.descripcion || "";
-        if (document.getElementById('card-real-name-display')) document.getElementById('card-real-name-display').innerText = data.nombreReal || "";
-        if (document.getElementById('card-birth-display')) document.getElementById('card-birth-display').innerText = data.fechaNacimiento || "";
-        if (document.getElementById('card-sexo-display')) document.getElementById('card-sexo-display').innerText = data.sexo || "";
+    try {
+        const doc = await db.collection('usuarios').doc(uid).get();
+        if (doc.exists) {
+            const data = doc.data();
+            const fields = {
+                'card-nick-display': data.nickname || "GLADIADOR",
+                'card-desc-display': data.descripcion || "",
+                'card-real-name-display': data.nombreReal || "",
+                'card-birth-display': data.fechaNacimiento || "",
+                'card-sexo-display': data.sexo || "",
+                'invocador-rango': `RANGO: ${data.rango || "INICIADO"}`
+            };
 
-        const rangeDisplay = document.getElementById('invocador-rango');
-        if (rangeDisplay) rangeDisplay.innerText = `RANGO: ${data.rango || "INICIADO"}`;
-        
-        if (data.photoCustom) {
-            const ids = ['profile-img-large', 'user-photo', 'user-photo-large'];
-            ids.forEach(id => {
+            for (let id in fields) {
                 const el = document.getElementById(id);
-                if (el) el.src = data.photoCustom;
-            });
+                if (el) el.innerText = fields[id];
+            }
+            
+            if (data.photoCustom) {
+                ['profile-img-large', 'user-photo', 'user-photo-large'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.src = data.photoCustom;
+                });
+            }
         }
-    }
+    } catch (e) { console.error("Error cargando tarjeta:", e); }
 }
 
 async function actualizarPerfil() {
@@ -213,61 +225,40 @@ async function inyectarCartasAleatoriasPortal() {
     const poolPE = cartas.filter(c => c.Bloque === "primera_era");
     const poolB1 = cartas.filter(c => c.Bloque === "primer_bloque");
 
-    const randomPE = poolPE[Math.floor(Math.random() * poolPE.length)];
-    const randomPB = poolB1[Math.floor(Math.random() * poolB1.length)];
+    if (poolPE.length > 0) {
+        const randomPE = poolPE[Math.floor(Math.random() * poolPE.length)];
+        const peCard = document.querySelector('.item-1');
+        if (peCard) peCard.style.backgroundImage = `url('img/cartas/${randomPE.Bloque}/${randomPE.Carpeta_Edicion}/${randomPE.Imagen}')`;
+    }
 
-    const peCard = document.querySelector('.item-1');
-    if (peCard && randomPE) {
-        const rutaPE = `img/cartas/${randomPE.Bloque}/${randomPE.Carpeta_Edicion}/${randomPE.Imagen}`;
-        peCard.style.backgroundImage = `url('${rutaPE}')`;
-        peCard.style.backgroundSize = "cover";
-        peCard.style.backgroundPosition = "center";
+    if (poolB1.length > 0) {
+        const randomPB = poolB1[Math.floor(Math.random() * poolB1.length)];
+        const pbCard = document.querySelector('.item-2');
+        if (pbCard) pbCard.style.backgroundImage = `url('img/cartas/${randomPB.Bloque}/${randomPB.Carpeta_Edicion}/${randomPB.Imagen}')`;
     }
 
     const libCard = document.querySelector('.item-3');
-    if (libCard) {
-        libCard.style.backgroundImage = "url('img/Grimorio-Digital.jpg')";
-        libCard.style.backgroundSize = "cover";
-        libCard.style.backgroundPosition = "center";
-    }
-
-    const pbCard = document.querySelector('.item-2');
-    if (pbCard && randomPB) {
-        const rutaPB = `img/cartas/${randomPB.Bloque}/${randomPB.Carpeta_Edicion}/${randomPB.Imagen}`;
-        pbCard.style.backgroundImage = `url('${rutaPB}')`;
-        pbCard.style.backgroundSize = "cover";
-        pbCard.style.backgroundPosition = "center";
-    }
+    if (libCard) libCard.style.backgroundImage = "url('img/Grimorio-Digital.jpg')";
 }
 
 // ==========================================
 // 8. EVENTOS DE INTERFAZ GLOBAL
 // ==========================================
 
-// Delegación de eventos para el menú de usuario
-document.addEventListener('click', (e) => {
-    const userCapsule = e.target.closest('#user-logged');
-    const dropdown = document.getElementById('user-dropdown');
-
-    if (userCapsule && dropdown) {
-        e.stopPropagation();
-        dropdown.classList.toggle('active');
-    } else if (dropdown && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('active');
-    }
-});
-
 // Logout Global
 const logoutBtn = document.getElementById('btn-logout');
 if (logoutBtn) {
-    logoutBtn.onclick = () => {
+    logoutBtn.onclick = (e) => {
+        e.preventDefault();
         auth.signOut().then(() => { window.location.href = 'index.html'; });
     };
 }
 
-// Inicialización de datos y portal
-cargarGrimorio().then(() => {
-    if (document.querySelector('.arte-cartas-contenedor')) {
-        inyectarCartasAleatoriasPortal();
-    }
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+    cargarGrimorio().then(() => {
+        if (document.querySelector('.arte-cartas-contenedor')) {
+            inyectarCartasAleatoriasPortal();
+        }
+    });
 });

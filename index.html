@@ -28,6 +28,26 @@
             min-height: 100vh;
         }
 
+        /* --- FIX PARA IMÁGENES DE CARTAS COMPLETAS --- */
+        .carta-arte {
+            background-size: contain !important; /* Muestra la carta completa sin recortar */
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .carta-arte:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .card-overlay {
+            background: rgba(0, 0, 0, 0.3) !important;
+        }
+
         /* Blindaje de Interfaz (Oculto hasta que Auth responda) */
         #btn-login, #user-logged {
             display: none !important;
@@ -101,8 +121,22 @@
         }
         #user-dropdown.active { display: flex !important; }
 
-        /* AJUSTE DE CAPAS PARA EL HEADER CLICABLE */
-        .main-header { position: relative; z-index: 10001; cursor: pointer; }
+        /* AJUSTE DE CAPAS Y POSICIÓN DEL LOGO */
+        .main-header { position: relative; z-index: 10001; cursor: default; }
+        
+        .top-bar-left { position: relative; height: 100%; flex: 1; }
+        
+        .logo-click-area {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 80px;
+            width: 300px; 
+            height: 80px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
         .top-bar-right { position: relative; z-index: 20000 !important; cursor: default; }
         
         .hero-block { pointer-events: none; margin-bottom: 20px; }
@@ -112,9 +146,11 @@
 
 <body class="body-santuario">
 
-    <header class="main-header" onclick="location.href='biblioteca.html'">
+    <header class="main-header">
         <div class="top-bar-container">
-            <div class="top-bar-left"></div>
+            <div class="top-bar-left">
+                <a href="biblioteca.html" class="logo-click-area" title="Ir a la Biblioteca"></a>
+            </div>
 
             <div class="top-bar-right" onclick="event.stopPropagation();">
                 <button id="btn-login" class="btn-místico">ASCENDER</button>
@@ -159,7 +195,6 @@
                                 <span class="era-tag">1ª Era</span>
                                 <div class="card-content-info">
                                     <h4>PRIMERA ERA</h4>
-                                    <p></p>
                                 </div>
                             </div>
                         </div>
@@ -180,7 +215,6 @@
                                 <span class="era-tag">B1</span>
                                 <div class="card-content-info">
                                     <h4>PRIMER BLOQUE</h4>
-                                    <p></p>
                                 </div>
                             </div>
                         </div>

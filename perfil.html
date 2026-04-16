@@ -22,17 +22,48 @@
             display: block !important; 
         }
 
-        /* Header simplificado: Sin Banner, solo para el botón de usuario */
+        /* 1. BLINDAJE DE BOTONES: Ocultos por defecto para esperar a Auth */
+        #btn-login, #user-logged {
+            display: none !important;
+            opacity: 0;
+        }
+
+        /* Revelación mediante JS */
+        #btn-login.auth-ready { display: inline-block !important; opacity: 1 !important; }
+        #user-logged.auth-ready { display: flex !important; opacity: 1 !important; }
+
+        /* 2. HEADER Y POSICIONAMIENTO DEL LOGO */
         .main-header {
             position: relative;
             width: 100%;
             height: 80px; 
             display: flex !important;
-            justify-content: flex-end;
             align-items: center;
-            padding: 0 30px;
             z-index: 1000;
             background: transparent;
+        }
+
+        .top-bar-left { position: relative; height: 100%; flex: 1; }
+        
+        .logo-click-area {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 80px; 
+            width: 300px; 
+            height: 80px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .top-bar-right { 
+            position: relative; 
+            z-index: 20000 !important; 
+            margin-left: auto;
+            padding-right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         /* Estabilización del Layout Principal */
@@ -88,11 +119,15 @@
 </head>
 
 <body class="body-perfil">
-    <header class="main-header" onclick="location.href='biblioteca.html'">
-        <div class="top-bar-container" style="position: relative;">
-            <div class="top-bar-right">
+    <header class="main-header">
+        <div class="top-bar-container" style="width: 100%; display: flex; align-items: center;">
+            <div class="top-bar-left">
+                <a href="index.html" class="logo-click-area" title="Volver al Inicio"></a>
+            </div>
+
+            <div class="top-bar-right" onclick="event.stopPropagation();">
                 <button id="btn-login" class="btn-místico">ASCENDER</button>
-                <div id="user-logged" style="display: none;">
+                <div id="user-logged">
                     <span id="display-name-text">Cargando...</span>
                     <img id="user-photo" class="avatar-header" src="img/avatar-default.png" alt="Avatar">
 
@@ -117,7 +152,7 @@
 
     <main class="perfil-main">
         <div class="perfil-card">
-            <div id="perfil-view-wrapper">
+            <div id="perfil-view-wrapper" style="display: flex;">
                 
                 <div class="invocador-column" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center;">
                     <div id="invocador-view" class="view-block" style="display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; justify-content: center;">
@@ -213,7 +248,7 @@
     <div id="modal-galeria" class="avatar-gallery" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0a0a0a; border: 2px solid #d4af37; padding: 30px; z-index: 5000; width: 90%; max-width: 450px;">
         <h3 style="color: #d4af37; font-family: 'Cinzel'; text-align: center; margin-bottom: 20px;">ELIGE TU ESENCIA</h3>
         <div class="avatar-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-height: 350px; overflow-y: auto; padding: 10px;">
-            <img src="img/avatares/chesca_dark.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
+           <img src="img/avatares/chesca_dark.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
             <img src="img/avatares/guerrero.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
             <img src="img/avatares/mago.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
             <img src="img/avatares/elfo.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
@@ -226,6 +261,7 @@
             <img src="img/avatares/chesca_miau.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
             <img src="img/avatares/ps.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
             <img src="img/avatares/anillos.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
+            <img src="img/avatares/law.png" class="avatar-option" onclick="seleccionarAvatar(this.src)">
         </div>
         <button onclick="cerrarGaleria()" class="btn-dorado-perfil" style="margin-top: 20px;">CERRAR SANTUARIO</button>
     </div>
