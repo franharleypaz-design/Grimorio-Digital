@@ -2,19 +2,22 @@
 // 1. VARIABLES DE ESTADO Y REGLAS
 // ==========================================
 const BLOQUES = {
-    "primera-era": ["el_reto", "mundo_gotico", "la_ira_del_nahual", "ragnarok", "espiritu_de_dragon"],
-    "segunda-era": ["espada_sagrada", "helenica", "hijos_de_daana", "dominios_de_ra"]
+    "primera-era": [
+        "El_Reto", "Espiritu_de_Dragon", "La_ira_del_nahual", "Mundo_Gotico", "Ragnarok",
+        "Espada_Sagrada", "Cruzadas", "Aniversario_Espada_Sagrada",
+        "Helenica", "Imperio", "Aniversario_Helenica",
+        "Hijos_de_Daana", "Tierras_Altas", "Aniversario_Hijos_de_Daana",
+        "Dominios_de_Ra", "Encrucijada", "Aniversario_Dominios_de_Ra"
+    ],
+    "segunda-era": ["Espada_Sagrada", "Helenica", "Hijos_de_Daana", "Dominios_de_Ra"],
+    "primer_bloque": ["Espada_Sagrada", "Cruzadas", "Aniversario_Espada_Sagrada", "Helenica", "Imperio", "Aniversario_Helenica", "Hijos_de_Daana", "Tierras_Altas", "Dominios_de_Ra", "Encrucijada"]
 };
 
 let mazoActual = [];
 let slotId = "";
 let esMazo = false;
 let faseOroInicial = true;
-let configMazo = {
-    bloque: "",
-    formato: "",
-    raza: ""
-};
+let configMazo = { bloque: "", formato: "", raza: "" };
 
 // ==========================================
 // 2. INICIO Y CARGA
@@ -41,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('main-search')?.addEventListener('input', () => filtrarCartas());
-    document.getElementById('tipo-filter')?.addEventListener('change', () => filtrarCartas());
-    document.getElementById('raza-filter')?.addEventListener('change', () => filtrarCartas());
 });
 
 async function cargarDatosDelSlot() {
@@ -98,7 +99,7 @@ function actualizarSetup(esCargaInicial = false) {
     const selFormato = document.getElementById('select-formato');
     const selRaza = document.getElementById('select-raza');
     const overlay = document.getElementById('lock-overlay');
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.getElementById('sidebar');
 
     if (!selBloque) return;
 
@@ -142,13 +143,17 @@ function actualizarSetup(esCargaInicial = false) {
     if (bloqueOK && formatoOK && razaOK) {
         bloquearSelectores(true);
         if (overlay) overlay.classList.add('unlocked');
-        if (sidebar) sidebar.style.display = "block";
-
+        
         const tieneOroIni = mazoActual.some(item => {
             const c = cartasMyL.find(x => x.ID === item.id);
-            return c && c.Tipo.includes('Oro') && (!c.Habilidad || c.Habilidad.length < 5);
+            return c && c.Tipo.toLowerCase().includes('oro') && (c.Habilidad || "").length < 30;
         });
         faseOroInicial = !tieneOroIni;
+
+        if (!faseOroInicial && sidebar) {
+             actualizarFiltrosSidebar();
+        }
+        
         filtrarCartas();
     } else {
         if (overlay) overlay.classList.remove('unlocked');
@@ -176,13 +181,7 @@ function bloquearSelectores(bloquear) {
         const txtBloque = configMazo.bloque.replace(/-/g, ' ');
         const txtRaza = configMazo.raza ? ` | ${configMazo.raza}` : '';
         resumen.innerText = `${txtBloque} | ${configMazo.formato}${txtRaza}`;
-        resumen.style.color = 'var(--accent)';
-        resumen.style.marginRight = '15px';
-        resumen.style.paddingLeft = '15px';
-        resumen.style.borderLeft = '2px solid var(--accent)';
-        resumen.style.fontWeight = 'bold';
-        resumen.style.textTransform = 'uppercase';
-        resumen.style.fontFamily = "'Cinzel', serif";
+        resumen.className = "resumen-reglas-estilo";
         if (controlsRow) controlsRow.appendChild(resumen);
 
         const btnReset = document.createElement('button');
@@ -203,11 +202,19 @@ function resetearReglas() {
         if (!confirm("Si cambias las reglas podrías invalidar las cartas ya elegidas. ¿Continuar?")) return;
     }
     configMazo = { bloque: "", formato: "", raza: "" };
+    mazoActual = [];
+    faseOroInicial = true;
     document.getElementById('select-bloque').value = "";
     document.getElementById('select-formato').value = "";
     document.getElementById('select-raza').value = "";
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.style.display = "none";
+        sidebar.classList.add('sidebar-hidden');
+    }
     bloquearSelectores(false);
     actualizarSetup(false);
+    renderizarMazo();
 }
 
 // ==========================================
@@ -215,45 +222,46 @@ function resetearReglas() {
 // ==========================================
 function filtrarCartas() {
     const display = document.getElementById('card-display');
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.getElementById('sidebar');
     if (!display || !cartasMyL || !configMazo.bloque) return;
 
-    const edicionesPermitidas = BLOQUES[configMazo.bloque].map(e => e.toLowerCase().trim());
+    const edicionesPermitidas = BLOQUES[configMazo.bloque] || [];
+    
     let fuente = cartasMyL.filter(c => {
-        const edicionNorm = (c.Carpeta_Edicion || "").toLowerCase().trim();
+        const edicionNorm = (c.Carpeta_Edicion || "").trim();
         return edicionesPermitidas.includes(edicionNorm);
     });
 
     if (faseOroInicial) {
-        if (sidebar) {
-            sidebar.classList.add('sidebar-hidden');
-            sidebar.style.display = "none";
-        }
+        if (sidebar) sidebar.style.display = "none";
+        
         fuente = fuente.filter(c => {
             const tipo = (c.Tipo || "").toLowerCase();
             const habilidad = (c.Habilidad || "").trim().toLowerCase();
             const esOro = tipo.includes('oro');
-            const sinHabilidadReal = habilidad === "" || habilidad === "-" || habilidad === "sin habilidad" || habilidad.length < 12;
+            const sinHabilidadReal = habilidad === "" || habilidad === "-" || habilidad === "sin habilidad" || habilidad.length < 15;
             return esOro && sinHabilidadReal;
         });
+        
         if (fuente.length === 0) {
             display.innerHTML = `<div class="lock-message" style="position:static; color: #ff6666; border:none;">NO SE ENCONTRARON OROS INICIALES LEGALES EN ESTE BLOQUE.</div>`;
             return;
         }
         mostrarNotificacion("ETAPA 1: ELIGE TU ORO INICIAL", "👑");
     } else {
-        if (sidebar) {
-            sidebar.classList.remove('sidebar-hidden');
-            sidebar.style.display = "block";
-            sidebar.style.visibility = "visible";
+        // Si no es fase oro inicial, dejamos que filtros-constructor.js maneje la visibilidad y lógica avanzada
+        if (typeof filtrarCartasSidebar === 'function') {
+            return filtrarCartasSidebar(); 
         }
+
         const busqueda = (document.getElementById('main-search')?.value || "").toLowerCase();
-        const tipoFiltro = document.getElementById('tipo-filter')?.value || "";
+        const tipoFiltro = document.querySelector('input[name="tipo_carta"]:checked')?.value;
+        
         fuente = fuente.filter(c => {
-            if (configMazo.formato.includes('racial') && (c.Tipo || "").includes('Aliado')) {
+            if (configMazo.formato.includes('racial') && (c.Tipo || "").toLowerCase().includes('aliado')) {
                 if (c.Raza !== configMazo.raza) return false;
             }
-            if (tipoFiltro && !(c.Tipo || "").includes(tipoFiltro)) return false;
+            if (tipoFiltro && !(c.Tipo || "").toLowerCase().includes(tipoFiltro.toLowerCase())) return false;
             const nombre = (c.Nombre || "").toLowerCase();
             const hab = (c.Habilidad || "").toLowerCase();
             return nombre.includes(busqueda) || hab.includes(busqueda);
@@ -262,14 +270,34 @@ function filtrarCartas() {
     dibujarCartasConstructor(fuente);
 }
 
+function obtenerRutaImagen(c) {
+    const bloque = (c.Bloque || "").trim();
+    const edicion = (c.Carpeta_Edicion || "").trim();
+    const imagen = (c.Imagen || "").trim();
+
+    if (bloque === "primer_bloque") {
+        let padre = "";
+        if (edicion.includes("Espada_Sagrada") || edicion === "Cruzadas") padre = "Espada_Sagrada";
+        else if (edicion.includes("Helenica") || edicion === "Imperio") padre = "Helenica";
+        else if (edicion.includes("Hijos_de_Daana") || edicion === "Tierras_Altas") padre = "Hijos_de_Daana";
+        else if (edicion.includes("Dominios_de_Ra") || edicion === "Encrucijada") padre = "Dominios_de_Ra";
+
+        if (padre) {
+            return padre === edicion ? `img/cartas/${bloque}/${padre}/${imagen}` : `img/cartas/${bloque}/${padre}/${edicion}/${imagen}`;
+        }
+    }
+    return `img/cartas/${bloque}/${edicion}/${imagen}`;
+}
+
 function dibujarCartasConstructor(lista) {
     const display = document.getElementById('card-display');
+    if (!display) return;
     display.innerHTML = "";
     lista.forEach(c => {
-        const rutaImg = `img/cartas/${c.Bloque}/${c.Carpeta_Edicion}/${c.Imagen}`;
+        const rutaImg = obtenerRutaImagen(c);
         const div = document.createElement('div');
         div.className = "card-item";
-        div.innerHTML = `<img src="${rutaImg}" alt="${c.Nombre}" loading="lazy">`;
+        div.innerHTML = `<img src="${rutaImg}" alt="${c.Nombre}" loading="lazy" onerror="this.src='img/placeholder.png'">`;
         div.onclick = () => añadirCarta(c.ID);
         display.appendChild(div);
     });
@@ -285,24 +313,30 @@ function añadirCarta(id) {
     if (faseOroInicial) {
         mazoActual.push({ id: id, cant: 1, favorito: false });
         faseOroInicial = false;
+
+        // ACTIVAR SIDEBAR DINÁMICA
+        if (typeof actualizarFiltrosSidebar === 'function') {
+            actualizarFiltrosSidebar();
+        }
+        
         mostrarNotificacion("ORO INICIAL REGISTRADO. BUSCADOR LIBERADO.", "⚔️");
         filtrarCartas();
     } else {
-        let tieneOroYa = false;
         const totalCastilloActual = mazoActual.reduce((acc, item) => {
             const infoC = cartasMyL.find(c => c.ID === item.id);
             if (!infoC) return acc;
             const textoHab = (infoC.Habilidad || "").trim();
             const esOroBasico = infoC.Tipo.toLowerCase().includes('oro') && textoHab.length < 30;
-            if (esOroBasico && !tieneOroYa) {
-                tieneOroYa = true;
-                return acc + (item.cant - 1);
-            }
-            return acc + item.cant;
+            
+            // Regla 49+1: No contamos el primer oro básico (el inicial)
+            let esEsteElInicial = false;
+            if (esOroBasico && mazoActual[0].id === item.id) esEsteElInicial = true;
+
+            return acc + (esEsteElInicial ? (item.cant - 1) : item.cant);
         }, 0);
 
         if (totalCastilloActual >= 49) {
-            mostrarNotificacion("ESTRATEGIA COMPLETA (50 CARTAS).", "✅");
+            mostrarNotificacion("ESTRATEGIA COMPLETA (49 + 1 CARTAS).", "✅");
             return;
         }
 
@@ -340,7 +374,7 @@ function renderizarMazo() {
     let razasMap = {};
     let motorRobo = 0, motorAnula = 0;
 
-    mazoActual.forEach(item => {
+    mazoActual.forEach((item) => {
         const info = cartasMyL.find(c => c.ID === item.id);
         if (!info) return;
 
@@ -350,7 +384,7 @@ function renderizarMazo() {
         const esOro = tipo.includes('oro');
 
         for (let i = 0; i < item.cant; i++) {
-            if (esOro && !tieneOroIni && (textoHabilidad === "" || textoHabilidad === "-" || textoHabilidad.length < 30)) {
+            if (esOro && !tieneOroIni && textoHabilidad.length < 30) {
                 tieneOroIni = true;
                 nombreOroIni = info.Nombre;
             } else {
@@ -368,8 +402,8 @@ function renderizarMazo() {
                 } else {
                     countOtros++;
                 }
-                if (habLower.includes("roba") || habLower.includes("busca") || habLower.includes("mira") || habLower.includes("mazo castillo")) motorRobo++;
-                if (habLower.includes("anula") || habLower.includes("destruye") || habLower.includes("destierra")) motorAnula++;
+                if (habLower.includes("roba") || habLower.includes("busca") || habLower.includes("mira")) motorRobo++;
+                if (habLower.includes("anula") || habLower.includes("destruye")) motorAnula++;
                 if (!esOro) {
                     let c = parseInt(info.Coste) || 0;
                     if (c > 4) c = 4;
@@ -378,7 +412,7 @@ function renderizarMazo() {
             }
         }
 
-        const rutaImg = `img/cartas/${info.Bloque}/${info.Carpeta_Edicion}/${info.Imagen}`;
+        const rutaImg = obtenerRutaImagen(info);
         const div = document.createElement('div');
         div.className = "deck-card-item";
         div.innerHTML = `
@@ -390,23 +424,15 @@ function renderizarMazo() {
         container.appendChild(div);
     });
 
-    const elStatOroIni = document.getElementById('stat-oro-ini');
-    if (elStatOroIni) {
-        elStatOroIni.innerText = tieneOroIni ? "SÍ" : "NO";
-        elStatOroIni.style.color = tieneOroIni ? "#f7ef8a" : "#ff6666";
+    if (document.getElementById('stat-oro-ini')) {
+        document.getElementById('stat-oro-ini').innerText = tieneOroIni ? "SÍ" : "NO";
+        document.getElementById('stat-oro-ini').style.color = tieneOroIni ? "#f7ef8a" : "#ff6666";
     }
 
     document.getElementById('total-aliados').innerText = countAliados;
     document.getElementById('total-oros').innerText = countOrosMazo;
     document.getElementById('total-otros').innerText = countOtros;
-
-    const sumaTotalReal = countAliados + countOrosMazo + countOtros + (tieneOroIni ? 1 : 0);
-    const elTotalCards = document.getElementById('total-cards');
-    if (elTotalCards) {
-        elTotalCards.innerText = `${sumaTotalReal} / 50`;
-        elTotalCards.style.color = (sumaTotalReal >= 50) ? "#f7ef8a" : "#fff";
-    }
-
+    document.getElementById('total-cards').innerText = `${totalCastillo} / 49 + 1`;
     document.getElementById('fuerza-promedio').innerText = cuentaFuerza > 0 ? (sumaFuerza / cuentaFuerza).toFixed(1) : "0";
     document.getElementById('stat-robo').innerText = motorRobo;
     document.getElementById('stat-anula').innerText = motorAnula;
@@ -423,18 +449,10 @@ function renderizarMazo() {
         }
     }
 
-    let arquetipo = "ANALIZANDO...";
-    if (totalCastillo > 10) {
-        if (countAliados > 22) arquetipo = "AGRESIVO (AGGRO)";
-        else if (motorAnula > 7 || countOtros > 18) arquetipo = "CONTROL / LENTITUD";
-        else arquetipo = "MID-RANGE / EQUILIBRADO";
-    }
-    document.getElementById('arquetipo-sugerido').innerText = arquetipo;
-
     const oroStatus = document.getElementById('status-oro-inicial');
     if (oroStatus) {
         if (tieneOroIni) {
-            oroStatus.innerText = (sumaTotalReal >= 50) ? "✅ ESTRATEGIA COMPLETA" : `🛡️ ORO INICIAL: ${nombreOroIni}`;
+            oroStatus.innerText = (totalCastillo >= 49) ? "✅ ESTRATEGIA COMPLETA" : `🛡️ ORO INICIAL: ${nombreOroIni}`;
             oroStatus.style.background = "rgba(212, 175, 55, 0.2)";
             oroStatus.style.color = "#f7ef8a";
         } else {
@@ -451,22 +469,22 @@ function quitarCarta(id) {
         const info = cartasMyL.find(c => c.ID === id);
         if (!info) return;
         const textoHabilidad = (info.Habilidad || "").trim();
-        const esOroIniPotencial = info.Tipo.toLowerCase().includes('oro') && textoHabilidad.length < 30;
+        const esOroBasico = info.Tipo.toLowerCase().includes('oro') && textoHabilidad.length < 30;
 
-        if (esOroIniPotencial && !faseOroInicial) {
+        if (esOroBasico && !faseOroInicial && mazoActual[indice].cant === 1) {
             faseOroInicial = true;
-            const buscadorInput = document.getElementById('main-search');
-            if (buscadorInput) buscadorInput.value = "";
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.style.display = "none";
+                sidebar.classList.add('sidebar-hidden');
+            }
             mostrarNotificacion("ORO INICIAL ELIMINADO. SE REQUIERE UNO NUEVO.", "⚠️");
+            filtrarCartas();
         }
 
         mazoActual[indice].cant--;
         if (mazoActual[indice].cant <= 0) {
             mazoActual.splice(indice, 1);
-        }
-
-        if (faseOroInicial) {
-            filtrarCartas();
         }
         renderizarMazo();
     }
@@ -482,18 +500,10 @@ function setearValoresInterfaz() {
 }
 
 function liberarVistaMazoExistente() {
-    const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('lock-overlay');
-
-    if (sidebar) {
-        sidebar.style.display = "block";
-        sidebar.classList.remove('sidebar-hidden');
-        sidebar.style.visibility = "visible";
-        sidebar.style.opacity = "1";
-        sidebar.style.width = "320px";
-    }
+    
     if (overlay) overlay.classList.add('unlocked');
-
     bloquearSelectores(true);
 
     const tieneOroIni = mazoActual.some(item => {
@@ -503,15 +513,18 @@ function liberarVistaMazoExistente() {
     });
 
     faseOroInicial = !tieneOroIni;
+    
+    if (!faseOroInicial) {
+        if (typeof actualizarFiltrosSidebar === 'function') {
+            actualizarFiltrosSidebar();
+        } else if (sidebar) {
+            sidebar.style.display = "block";
+        }
+    }
     filtrarCartas();
 }
 
 function mostrarNotificacion(mensaje, icono = "⚠️") {
-    const notificacionesActivas = document.querySelectorAll('.notificacion-toast');
-    for (let n of notificacionesActivas) {
-        if (n.innerText.includes(mensaje)) return;
-    }
-
     let container = document.getElementById('notif-container');
     if (!container) {
         container = document.createElement('div');
@@ -519,68 +532,30 @@ function mostrarNotificacion(mensaje, icono = "⚠️") {
         container.style.cssText = "position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column-reverse; gap: 10px;";
         document.body.appendChild(container);
     }
-
     const toast = document.createElement('div');
     toast.className = 'notificacion-toast';
     toast.innerHTML = `<span>${icono}</span> ${mensaje}`;
-    toast.style.cssText = `
-        background: rgba(0, 0, 0, 0.95);
-        color: #fff;
-        padding: 12px 20px;
-        border-radius: 4px;
-        border-left: 4px solid #d4af37;
-        font-family: 'Cinzel', serif;
-        font-size: 0.8rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        transition: all 0.3s ease;
-    `;
+    toast.style.cssText = "background: rgba(0,0,0,0.9); color: #fff; padding: 12px 20px; border-radius: 4px; border-left: 4px solid #d4af37; font-family: 'Cinzel', serif; font-size: 0.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5);";
     container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = "0";
-        toast.style.transform = "translateX(-20px)";
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    setTimeout(() => { toast.remove(); }, 3000);
 }
 
 async function guardarMazoFirebase() {
-    if (!usuarioActual) {
-        mostrarNotificacion("DEBES INICIAR SESIÓN PARA GUARDAR", "🚫");
-        return;
-    }
-    if (mazoActual.length === 0) {
-        mostrarNotificacion("EL MAZO ESTÁ VACÍO", "⚠️");
-        return;
-    }
-
-    const tieneOroIni = mazoActual.some(item => {
-        const c = cartasMyL.find(x => x.ID === item.id);
-        const textoHab = (c?.Habilidad || "").trim();
-        return c && c.Tipo.toLowerCase().includes('oro') && textoHab.length < 30;
-    });
-
-    if (!tieneOroIni) {
-        mostrarNotificacion("FALTA ELEGIR EL ORO INICIAL", "⚠️");
-        return;
-    }
-
+    if (!usuarioActual) return mostrarNotificacion("INICIE SESIÓN", "🚫");
+    if (mazoActual.length === 0) return mostrarNotificacion("MAZO VACÍO", "⚠️");
+    
     try {
         const btn = document.querySelector('.btn-save-deck');
-        const originalText = btn ? btn.innerText : "GUARDAR CAMBIOS";
-        if (btn) btn.innerText = "GUARDANDO EN EL REINO...";
-
-        await db.collection('usuarios').doc(usuarioActual.uid)
-            .collection('slots').doc(slotId).set({
-                cartas: mazoActual,
-                config: configMazo,
-                ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-
-        if (btn) btn.innerText = originalText;
-        mostrarNotificacion("ESTRATEGIA GUARDADA EN EL GRIMORIO", "⭐");
-    } catch (error) {
-        console.error("Error al guardar mazo:", error);
-        mostrarNotificacion("ERROR AL CONECTAR CON EL REINO", "❌");
+        if (btn) btn.innerText = "GUARDANDO...";
+        await db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(slotId).set({
+            cartas: mazoActual,
+            config: configMazo,
+            ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        if (btn) btn.innerText = "GUARDADO";
+        mostrarNotificacion("ESTRATEGIA GUARDADA", "⭐");
+        setTimeout(() => { if (btn) btn.innerText = "GUARDAR CAMBIOS"; }, 2000);
+    } catch (e) {
+        mostrarNotificacion("ERROR AL GUARDAR", "❌");
     }
 }

@@ -55,7 +55,7 @@
             height: calc(100vh - 80px) !important;
             display: grid !important;
             grid-template-rows: auto 1fr !important;
-            grid-template-columns: 320px 1fr 380px !important; 
+            grid-template-columns: auto 1fr 380px !important; 
             grid-template-areas: 
                 "sidebar rules rules"
                 "sidebar main deck" !important;
@@ -66,30 +66,78 @@
 
         /* ASIGNACIÓN DE ÁREAS */
         .setup-rules-panel { grid-area: rules !important; margin-bottom: 0; z-index: 101; }
-        .sidebar { grid-area: sidebar !important; display: block !important; }
+        .sidebar { grid-area: sidebar !important; }
         .content-scroll { grid-area: main !important; position: relative; }
         .deck-builder-panel { grid-area: deck !important; }
 
-        /* 4. ESTILOS DE FILTROS (SIDEBAR) */
+        /* 4. ESTILOS DE FILTROS (SIDEBAR COLAPSABLE) */
         .sidebar {
             background: rgba(10, 10, 10, 0.9) !important;
             border-right: 1px solid rgba(212, 175, 55, 0.3) !important;
-            padding: 20px !important;
-            overflow-y: auto !important;
+            padding: 0;
+            width: 0;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transition: width 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
         }
 
-        .filter-group { margin-bottom: 25px; transition: opacity 0.3s ease; }
-        .filter-group.disabled { opacity: 0.3; pointer-events: none; }
+        .sidebar.sidebar-visible {
+            display: block !important;
+            width: 320px !important;
+            padding: 20px !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
 
-        .filter-group h3 {
+        /* DISEÑO DE GRUPO COLAPSABLE */
+        .filter-group { 
+            margin-bottom: 10px; 
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        
+        .filter-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+            transition: color 0.3s ease;
+        }
+
+        .filter-group-header h3 {
             color: #d4af37 !important;
             font-family: 'Cinzel', serif !important;
-            font-size: 0.85rem !important;
+            font-size: 0.8rem !important;
             letter-spacing: 1px !important;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
-            padding-bottom: 8px !important;
-            margin-bottom: 15px !important;
+            margin: 0 !important;
             text-transform: uppercase !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .filter-group-header::after {
+            content: '▼';
+            font-size: 0.6rem;
+            color: #d4af37;
+            transition: transform 0.3s ease;
+        }
+
+        .filter-group.active .filter-group-header::after {
+            transform: rotate(180deg);
+        }
+
+        .filter-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.3s ease;
+            padding: 0 5px;
+        }
+
+        .filter-group.active .filter-content {
+            max-height: 500px; /* Suficiente para el contenido */
+            padding-bottom: 15px;
         }
 
         .filter-list { list-style: none; padding: 0; margin: 0; }
@@ -101,17 +149,17 @@
             font-family: 'Cinzel', serif;
             font-size: 0.75rem;
             cursor: pointer;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             text-transform: uppercase;
         }
 
         .radio-container input { display: none; }
         .checkmark {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border: 1px solid #d4af37;
             border-radius: 50%;
-            margin-right: 15px;
+            margin-right: 12px;
             display: inline-block;
             flex-shrink: 0;
         }
@@ -132,35 +180,16 @@
             border-radius: 4px;
         }
 
-        .search-container-sidebar {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
         #main-search {
             width: 100%;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid #d4af37;
             color: #fff;
-            padding: 10px 35px 10px 10px;
+            padding: 8px;
             border-radius: 4px;
             font-family: 'Poppins', sans-serif;
             font-size: 0.8rem;
             box-sizing: border-box;
-        }
-
-        #btn-clear-search {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #d4af37;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: none;
-            line-height: 1;
         }
     </style>
 </head>
@@ -198,49 +227,73 @@
 
     <main class="constructor-layout">
 
-        <aside class="sidebar" id="sidebar" style="display: none;">
-            <section class="filter-group">
-                <h3>BUSCADOR</h3>
-                <div class="search-container-sidebar">
-                    <input type="text" id="main-search" placeholder="Buscar por nombre o habilidad...">
-                    <button id="btn-clear-search" title="Limpiar búsqueda">×</button>
+        <aside class="sidebar sidebar-hidden" id="sidebar" style="display: none;">
+            
+            <section class="filter-group active">
+                <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
+                    <h3>BUSCADOR</h3>
+                </div>
+                <div class="filter-content">
+                    <div class="search-container-sidebar">
+                        <input type="text" id="main-search" placeholder="Nombre o habilidad...">
+                    </div>
                 </div>
             </section>
 
-            <section class="filter-group">
-                <h3>ERA / BLOQUE</h3>
-                <ul class="filter-list">
-                    <li><label class="radio-container"><input type="radio" name="era" value="primera-era" class="filter-era" onchange="filtrarCartas()"> <span class="checkmark"></span> 1ª ERA</label></li>
-                    <li><label class="radio-container"><input type="radio" name="era" value="segunda-era" class="filter-era" onchange="filtrarCartas()"> <span class="checkmark"></span> 2ª ERA</label></li>
-                </ul>
+            <section class="filter-group active" id="section-era-info">
+                <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
+                    <h3>ERA SELECCIONADA</h3>
+                </div>
+                <div class="filter-content">
+                    <ul class="filter-list">
+                        <li><label class="radio-container"><input type="radio" name="era" value="primera-era" disabled> <span class="checkmark"></span> 1ª ERA</label></li>
+                        <li><label class="radio-container"><input type="radio" name="era" value="segunda-era" disabled> <span class="checkmark"></span> 2ª ERA</label></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="filter-group active" id="section-tipo-carta">
+                <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
+                    <h3>TIPO DE CARTA</h3>
+                </div>
+                <div class="filter-content">
+                    <ul class="filter-list">
+                        <li><label class="radio-container"><input type="radio" name="tipo_carta" value="aliado" onchange="filtrarCartas()"> <span class="checkmark"></span> ALIADO</label></li>
+                        <li><label class="radio-container"><input type="radio" name="tipo_carta" value="talisman" onchange="filtrarCartas()"> <span class="checkmark"></span> TALISMÁN</label></li>
+                        <li><label class="radio-container"><input type="radio" name="tipo_carta" value="totem" onchange="filtrarCartas()"> <span class="checkmark"></span> TÓTEM</label></li>
+                        <li><label class="radio-container"><input type="radio" name="tipo_carta" value="arma" onchange="filtrarCartas()"> <span class="checkmark"></span> ARMA</label></li>
+                        <li><label class="radio-container"><input type="radio" name="tipo_carta" value="oro" onchange="filtrarCartas()"> <span class="checkmark"></span> ORO</label></li>
+                    </ul>
+                </div>
             </section>
 
             <section class="filter-group disabled" id="section-ediciones">
-                <h3>EDICIONES</h3>
-                <ul id="lista-ediciones" class="filter-list"></ul>
+                <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
+                    <h3>EDICIONES</h3>
+                </div>
+                <div class="filter-content">
+                    <ul id="lista-ediciones" class="filter-list"></ul>
+                </div>
             </section>
 
             <section class="filter-group disabled" id="section-expansiones">
-                <h3>EXPANSIÓN</h3>
-                <ul id="lista-expansiones" class="filter-list"></ul>
+                <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
+                    <h3>EXPANSIÓN</h3>
+                </div>
+                <div class="filter-content">
+                    <ul id="lista-expansiones" class="filter-list"></ul>
+                </div>
             </section>
 
-            <section class="filter-group">
-                <h3>TIPO DE CARTA</h3>
-                <ul class="filter-list">
-                    <li><label class="radio-container"><input type="radio" name="tipo_carta" value="aliado" class="filter-type" onchange="filtrarCartas()"> <span class="checkmark"></span> ALIADO</label></li>
-                    <li><label class="radio-container"><input type="radio" name="tipo_carta" value="talisman" class="filter-type" onchange="filtrarCartas()"> <span class="checkmark"></span> TALISMÁN</label></li>
-                    <li><label class="radio-container"><input type="radio" name="tipo_carta" value="totem" class="filter-type" onchange="filtrarCartas()"> <span class="checkmark"></span> TÓTEM</label></li>
-                    <li><label class="radio-container"><input type="radio" name="tipo_carta" value="arma" class="filter-type" onchange="filtrarCartas()"> <span class="checkmark"></span> ARMA</label></li>
-                    <li><label class="radio-container"><input type="radio" name="tipo_carta" value="oro" class="filter-type" onchange="filtrarCartas()"> <span class="checkmark"></span> ORO</label></li>
-                </ul>
-            </section>
-
-            <section class="filter-group disabled" id="section-raza">
-                <h3>RAZA</h3>
-                <select id="raza-filter" class="form-control-místico" onchange="filtrarCartas()">
-                    <option value="">Todas las razas</option>
-                </select>
+            <section class="filter-group" id="section-raza" style="display:none;">
+                <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
+                    <h3>RAZA</h3>
+                </div>
+                <div class="filter-content">
+                    <select id="raza-filter" class="form-control-místico" disabled>
+                        <option value="">Cargando Raza...</option>
+                    </select>
+                </div>
             </section>
         </aside>
 
@@ -287,7 +340,7 @@
                     <div>OROS MAZO: <strong id="total-oros">0</strong></div>
                     <div>OTROS: <strong id="total-otros">0</strong></div>
                     <div style="grid-column: span 2; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 5px; margin-top: 5px;">
-                        TOTAL ESTRATEGIA: <strong id="total-cards">0 / 50</strong>
+                        TOTAL ESTRATEGIA: <strong id="total-cards">0 / 49 + 1</strong>
                     </div>
                 </div>
 
@@ -351,7 +404,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
-    <script src="filtros.js"></script>
+    <script src="filtros-constructor.js"></script>
     <script src="constructor.js"></script>
 
     <script>

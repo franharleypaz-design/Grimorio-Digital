@@ -242,9 +242,9 @@ body.modo-album .constructor-layout {
 /* Gráfico de Curva */
 .curva-visual {
     display: flex;
-    align-items: flex-end; /* Importante para que las barras suban */
+    align-items: flex-end; 
     justify-content: space-between;
-    height: 60px; /* Ajustado para mejor visibilidad */
+    height: 60px; 
     border-bottom: 1px solid rgba(212, 175, 55, 0.3);
     margin-bottom: 10px;
     padding: 0 5px;
@@ -264,7 +264,7 @@ body.modo-album .constructor-layout {
     background: linear-gradient(to top, #b8860b, #f7ef8a);
     border-radius: 2px 2px 0 0;
     transition: height 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-    min-height: 1px; /* Evita que desaparezca totalmente */
+    min-height: 1px; 
 }
 
 .barra-box span { font-size: 0.6rem; color: var(--accent); margin-top: 4px; }
