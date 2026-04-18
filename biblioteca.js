@@ -23,11 +23,57 @@ function inicializarBiblioteca() {
     }
 
     // --- RENDERIZADO INICIAL ---
-    // Usamos el motor unificado para dibujar la grilla por primera vez
     filtrarBiblioteca(); 
     
     // --- PROCESAR FILTRO DE URL ---
     revisarParametrosURL();
+}
+
+/**
+ * FUNCIÓN DE RUTAS DINÁMICA (SOLUCIÓN DEFINITIVA)
+ * Resuelve la estructura anidada según tu diagrama de árbol:
+ * primer_bloque/Padre/Hijo (Aniversarios y Expansiones)
+ */
+function obtenerRutaImagenGeneral(c) {
+    const bloque = (c.Bloque || "").trim();
+    const edicion = (c.Carpeta_Edicion || "").trim();
+    const imagen = (c.Imagen || "").trim();
+
+    // 1. Si el bloque es primera_era (El_Reto, Ragnarok, etc.), ruta directa
+    if (bloque === "primera_era") {
+        return `img/cartas/${bloque}/${edicion}/${imagen}`;
+    }
+
+    // 2. Si es primer_bloque, aplicamos lógica de carpetas padre (Espada, Helénica, etc.)
+    if (bloque === "primer_bloque") {
+        let carpetaPadre = "";
+
+        // Determinamos la carpeta padre según la edición
+        if (edicion.includes("Espada_Sagrada") || edicion === "Cruzadas") {
+            carpetaPadre = "Espada_Sagrada";
+        } 
+        else if (edicion.includes("Helenica") || edicion === "Imperio") {
+            carpetaPadre = "Helenica";
+        } 
+        else if (edicion.includes("Hijos_de_Daana") || edicion === "Tierras_Altas") {
+            carpetaPadre = "Hijos_de_Daana";
+        } 
+        else if (edicion.includes("Dominios_de_Ra") || edicion === "Encrucijada") {
+            carpetaPadre = "Dominios_de_Ra";
+        }
+
+        if (carpetaPadre) {
+            // Si la edición es la base (ej: Espada_Sagrada), no anidamos más
+            if (carpetaPadre === edicion) {
+                return `img/cartas/${bloque}/${carpetaPadre}/${imagen}`;
+            }
+            // Si es edición especial o aniversario (ej: Espada_Sagrada/Cruzadas), anidamos
+            return `img/cartas/${bloque}/${carpetaPadre}/${edicion}/${imagen}`;
+        }
+    }
+
+    // 3. Fallback: Ruta estándar
+    return `img/cartas/${bloque}/${edicion}/${imagen}`;
 }
 
 /**
@@ -41,7 +87,6 @@ function revisarParametrosURL() {
         const radioEra = document.querySelector(`.filter-era[value="${bloqueURL}"]`);
         if (radioEra) {
             radioEra.checked = true;
-            // Disparamos el evento change para que filtros.js active la cascada
             radioEra.dispatchEvent(new Event('change'));
         }
     }
@@ -49,7 +94,6 @@ function revisarParametrosURL() {
 
 /**
  * FUNCIÓN MAESTRA DE FILTRADO
- * Delega la lógica al motor estratégico de filtros.js
  */
 function filtrarBiblioteca() {
     if (typeof motorDeFiltradoGlobal !== 'function') {
@@ -57,10 +101,7 @@ function filtrarBiblioteca() {
         return;
     }
 
-    // Obtenemos la lista filtrada desde el motor unificado
     const cartasFiltradas = motorDeFiltradoGlobal(cartasMyL);
-    
-    // Renderizamos los resultados en la grilla
     dibujarGrillaBiblioteca(cartasFiltradas);
 }
 
@@ -75,7 +116,6 @@ function dibujarGrillaBiblioteca(lista) {
     const fragmento = document.createDocumentFragment();
 
     lista.forEach(c => {
-        // Usamos la función de rutas unificada (maneja expansiones y carpetas padre)
         const rutaImg = obtenerRutaImagenGeneral(c);
         
         const div = document.createElement('div');
@@ -122,7 +162,6 @@ async function abrirDetalleBiblioteca(c, ruta) {
         document.getElementById('detail-illustrator').innerText = `Ilustrador: ${c.Ilustrador || 'Desconocido'}`;
     }
 
-    // --- GESTIÓN DE BOTONES DE CARPETA (FIREBASE) ---
     const btnContainer = document.getElementById('save-button-container');
     if (btnContainer) {
         btnContainer.innerHTML = ""; 
@@ -137,7 +176,6 @@ async function abrirDetalleBiblioteca(c, ruta) {
             const divOpciones = document.createElement('div');
             divOpciones.className = "folder-actions-row";
 
-            // Verificar posesión de carta
             const promesas = carpetas.map(f => 
                 db.collection('usuarios').doc(usuarioActual.uid).collection('slots').doc(f.id).get()
             );
@@ -188,7 +226,6 @@ async function ejecutarEnvioACarpeta(id, slot, nombreCarpeta) {
     }
 }
 
-// Escucha global para cerrar el panel si se hace clic fuera del contenido o en el botón X
 document.addEventListener('click', (e) => {
     if (e.target.id === 'close-detail' || e.target.closest('#close-detail')) {
         const panel = document.getElementById('card-detail-panel');
