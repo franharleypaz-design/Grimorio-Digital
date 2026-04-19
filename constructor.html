@@ -185,7 +185,7 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid #d4af37;
             color: #fff;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             font-family: 'Poppins', sans-serif;
             font-size: 0.8rem;
@@ -229,6 +229,19 @@
 
         <aside class="sidebar sidebar-hidden" id="sidebar" style="display: none;">
             
+            <section class="filter-group active">
+                <div class="filter-group-header">
+                    <h3>VISTA ACTUAL</h3>
+                </div>
+                <div class="filter-content">
+                    <button id="btn-ver-mazo" class="btn-místico" 
+                            style="width: 100%; background: #fff; color: #000; margin-bottom: 10px; font-weight: bold; border: 1px solid #d4af37;" 
+                            onclick="toggleViewMode()">
+                        🗂️ VER MI MAZO
+                    </button>
+                </div>
+            </section>
+
             <section class="filter-group active">
                 <div class="filter-group-header" onclick="this.parentElement.classList.toggle('active')">
                     <h3>BUSCADOR</h3>

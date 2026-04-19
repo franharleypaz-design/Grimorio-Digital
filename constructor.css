@@ -113,7 +113,6 @@ body.modo-album .constructor-layout {
     transition: width 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
 }
 
-/* CLASE DE JS PARA MOSTRAR (Tras elegir Oro Inicial / faseOroInicial = false) */
 .sidebar.sidebar-visible,
 .sidebar:not(.sidebar-hidden) {
     display: block !important;
@@ -135,13 +134,54 @@ body.modo-album .constructor-layout {
     font-family: 'Cinzel', serif;
 }
 
+/* --- BOTÓN DE EXHIBICIÓN (ESTILO MÍSTICO MEJORADO) --- */
+.btn-exhibicion-toggle {
+    width: 100%;
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid var(--accent) !important;
+    padding: 12px 10px !important;
+    font-family: 'Cinzel', serif !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 1px !important;
+    cursor: pointer !important;
+    text-transform: uppercase !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.btn-exhibicion-toggle:hover {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.8) !important;
+    background: #fdfdfd !important;
+    transform: translateY(-1px);
+}
+
+.btn-exhibicion-toggle.modo-deck {
+    background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
+    color: #000 !important;
+    border-color: #f7ef8a !important;
+    box-shadow: 0 0 15px #d4af37 !important;
+}
+
+.btn-exhibicion-toggle span {
+    font-size: 1.1rem;
+}
+
 #main-search {
     width: 100%;
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--accent);
     color: #fff;
-    padding: 8px;
+    padding: 10px;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 /* 5. CONTENIDO CENTRAL (MAIN) */

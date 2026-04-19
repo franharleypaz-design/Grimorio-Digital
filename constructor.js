@@ -17,7 +17,8 @@ let mazoActual = [];
 let slotId = "";
 let esMazo = false;
 let faseOroInicial = true;
-let configMazo = { bloque: "", formato: "", raza: "" };
+// Se incluye viewMode por defecto en el estado
+let configMazo = { bloque: "", formato: "", raza: "", viewMode: "builder" }; 
 
 // ==========================================
 // 2. INICIO Y CARGA
@@ -43,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('main-search')?.addEventListener('input', () => filtrarCartas());
+    // Escucha el input de búsqueda (la función reside en filtros-constructor.js)
+    document.getElementById('main-search')?.addEventListener('input', () => {
+        if (typeof filtrarCartas === 'function') filtrarCartas();
+    });
 });
 
 async function cargarDatosDelSlot() {
@@ -54,7 +58,9 @@ async function cargarDatosDelSlot() {
         if (doc.exists) {
             const data = doc.data();
             mazoActual = data.cartas || [];
-            configMazo = data.config || { bloque: "", formato: "", raza: "" };
+            // Asegurar que config tenga viewMode si no existe en DB
+            configMazo = data.config || { bloque: "", formato: "", raza: "", viewMode: "builder" };
+            if (!configMazo.viewMode) configMazo.viewMode = "builder";
 
             const displayNombre = document.getElementById('slot-id-display');
             if (displayNombre) {
@@ -85,7 +91,7 @@ function verificarYRenderizar() {
     const reintento = setInterval(() => {
         if (typeof cartasMyL !== 'undefined' && cartasMyL.length > 0) {
             clearInterval(reintento);
-            filtrarCartas();
+            if (typeof filtrarCartas === 'function') filtrarCartas();
             renderizarMazo();
         }
     }, 500);
@@ -159,7 +165,7 @@ function actualizarSetup(esCargaInicial = false) {
             }
         }
         
-        filtrarCartas();
+        if (typeof filtrarCartas === 'function') filtrarCartas();
     } else {
         if (overlay) overlay.classList.remove('unlocked');
         if (sidebar) {
@@ -209,18 +215,29 @@ function resetearReglas() {
     if (mazoActual.length > 0) {
         if (!confirm("Si cambias las reglas podrías invalidar las cartas ya elegidas. ¿Continuar?")) return;
     }
-    configMazo = { bloque: "", formato: "", raza: "" };
+    // 1. Limpiar Estado Global
+    configMazo = { bloque: "", formato: "", raza: "", viewMode: "builder" };
     mazoActual = [];
     faseOroInicial = true;
+
+    // 2. Limpiar Interfaz de Reglas
     document.getElementById('select-bloque').value = "";
     document.getElementById('select-formato').value = "";
     document.getElementById('select-raza').value = "";
+    
+    // 3. Resetear Sidebar y Vista
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
         sidebar.style.display = "none";
         sidebar.classList.add('sidebar-hidden');
         sidebar.classList.remove('sidebar-visible');
     }
+
+    // 4. Limpiar Grid de Cartas (Vista Central)
+    const display = document.getElementById('card-display');
+    if (display) display.innerHTML = "";
+
+    // 5. Reiniciar componentes y render
     bloquearSelectores(false);
     actualizarSetup(false);
     renderizarMazo();
@@ -361,7 +378,7 @@ function añadirCarta(id) {
         }
         
         mostrarNotificacion("ORO INICIAL REGISTRADO", "⚔️");
-        filtrarCartas();
+        if (typeof filtrarCartas === 'function') filtrarCartas();
     } else {
         const totalMazoSinOroIni = mazoActual.reduce((acc, item) => {
             const infoC = cartasMyL.find(c => c.ID === item.id);
@@ -413,7 +430,7 @@ function quitarCarta(id) {
                 sidebar.classList.add('sidebar-hidden');
             }
             mostrarNotificacion("ORO INICIAL ELIMINADO. SE REQUIERE UNO NUEVO.", "⚠️");
-            filtrarCartas();
+            if (typeof filtrarCartas === 'function') filtrarCartas();
         }
 
         mazoActual[indice].cant--;
@@ -425,59 +442,8 @@ function quitarCarta(id) {
 }
 
 // ==========================================
-// 5. FILTRADO Y RECURSOS
+// 5. RECURSOS COMPARTIDOS
 // ==========================================
-function filtrarCartas() {
-    const display = document.getElementById('card-display');
-    const sidebar = document.getElementById('sidebar');
-    if (!display || !cartasMyL || !configMazo.bloque) return;
-
-    const edicionesPermitidas = BLOQUES[configMazo.bloque] || [];
-    
-    let fuente = cartasMyL.filter(c => {
-        const edicionNorm = (c.Carpeta_Edicion || "").trim();
-        return edicionesPermitidas.includes(edicionNorm);
-    });
-
-    if (faseOroInicial) {
-        if (sidebar) {
-            sidebar.style.display = "none";
-            sidebar.classList.remove('sidebar-visible');
-        }
-        
-        fuente = fuente.filter(c => {
-            const tipo = (c.Tipo || "").toLowerCase();
-            const habilidad = (c.Habilidad || "").trim().toLowerCase();
-            const esOro = tipo.includes('oro');
-            const sinHabilidadReal = habilidad === "" || habilidad === "-" || habilidad === "sin habilidad" || habilidad.length < 15;
-            return esOro && sinHabilidadReal;
-        });
-        
-        if (fuente.length === 0) {
-            display.innerHTML = `<div class="lock-message" style="position:static; color: #ff6666; border:none;">NO SE ENCONTRARON OROS INICIALES LEGALES EN ESTE BLOQUE.</div>`;
-            return;
-        }
-        mostrarNotificacion("ETAPA 1: ELIGE TU ORO INICIAL", "👑");
-    } else {
-        if (typeof filtrarCartasSidebar === 'function') {
-            return filtrarCartasSidebar(); 
-        }
-
-        const busqueda = (document.getElementById('main-search')?.value || "").toLowerCase();
-        const tipoFiltro = document.querySelector('input[name="tipo_carta"]:checked')?.value;
-        
-        fuente = fuente.filter(c => {
-            if (configMazo.formato.includes('racial') && (c.Tipo || "").toLowerCase().includes('aliado')) {
-                if (c.Raza !== configMazo.raza) return false;
-            }
-            if (tipoFiltro && !(c.Tipo || "").toLowerCase().includes(tipoFiltro.toLowerCase())) return false;
-            const nombre = (c.Nombre || "").toLowerCase();
-            const hab = (c.Habilidad || "").toLowerCase();
-            return nombre.includes(busqueda) || hab.includes(busqueda);
-        });
-    }
-    dibujarCartasConstructor(fuente);
-}
 
 function obtenerRutaImagen(c) {
     const bloque = (c.Bloque || "").trim();
@@ -513,35 +479,7 @@ function dibujarCartasConstructor(lista) {
 }
 
 // ==========================================
-// 6. NOTIFICACIONES MÍSTICAS
-// ==========================================
-function mostrarNotificacion(mensaje, icono = "✨") {
-    const existentes = document.querySelectorAll('.notificacion-flotante');
-    for (let n of existentes) if (n.innerText.includes(mensaje)) return;
-
-    let container = document.getElementById('notif-container-flotante');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'notif-container-flotante';
-        container.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; display: flex; flex-direction: column; gap: 15px; pointer-events: none;`;
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = 'notificacion-flotante';
-    toast.innerHTML = `<span>${icono}</span> ${mensaje}`;
-    toast.style.cssText = `background: rgba(10, 10, 10, 0.95); color: #d4af37; padding: 15px 30px; border: 1px solid #d4af37; border-radius: 4px; font-family: 'Cinzel', serif; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.2); animation: misticFadeIn 0.5s ease-out forwards; white-space: nowrap; display: flex; align-items: center; gap: 12px;`;
-    
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.animation = "misticFadeOut 0.5s ease-in forwards";
-        setTimeout(() => toast.remove(), 500);
-    }, 2500);
-}
-
-// ==========================================
-// 7. PERSISTENCIA Y UTILIDADES
+// 6. NOTIFICACIONES Y PERSISTENCIA
 // ==========================================
 function setearValoresInterfaz() {
     const b = document.getElementById('select-bloque');
@@ -574,7 +512,44 @@ function liberarVistaMazoExistente() {
             actualizarFiltrosSidebar();
         }
     }
-    filtrarCartas();
+    if (typeof filtrarCartas === 'function') filtrarCartas();
+}
+
+function mostrarNotificacion(mensaje, icono = "✨") {
+    const existentes = document.querySelectorAll('.notificacion-flotante');
+    for (let n of existentes) {
+        if (n.innerText.includes(mensaje)) return;
+    }
+
+    let container = document.getElementById('notif-container-flotante');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notif-container-flotante';
+        container.style.cssText = `
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10000; display: flex; flex-direction: column; gap: 15px; pointer-events: none;
+        `;
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'notificacion-flotante';
+    toast.innerHTML = `<span>${icono}</span> ${mensaje}`;
+    toast.style.cssText = `
+        background: rgba(10, 10, 10, 0.95); color: #d4af37; padding: 15px 30px;
+        border: 1px solid #d4af37; border-radius: 4px; font-family: 'Cinzel', serif;
+        font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.2);
+        animation: misticFadeIn 0.5s ease-out forwards; white-space: nowrap;
+        display: flex; align-items: center; gap: 12px;
+    `;
+    
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = "misticFadeOut 0.5s ease-in forwards";
+        setTimeout(() => toast.remove(), 500);
+    }, 2500);
 }
 
 async function guardarMazoFirebase() {
