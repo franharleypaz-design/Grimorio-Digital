@@ -81,7 +81,7 @@ async function cargarDatosDelSlot() {
                 actualizarSetup(true);
             }
         }
-        renderizarMazo();
+        if (typeof renderizarMazo === 'function') renderizarMazo();
     } catch (e) {
         console.error("Error en conexión astral:", e);
     }
@@ -92,7 +92,7 @@ function verificarYRenderizar() {
         if (typeof cartasMyL !== 'undefined' && cartasMyL.length > 0) {
             clearInterval(reintento);
             if (typeof filtrarCartas === 'function') filtrarCartas();
-            renderizarMazo();
+            if (typeof renderizarMazo === 'function') renderizarMazo();
         }
     }, 500);
 }
@@ -215,149 +215,28 @@ function resetearReglas() {
     if (mazoActual.length > 0) {
         if (!confirm("Si cambias las reglas podrías invalidar las cartas ya elegidas. ¿Continuar?")) return;
     }
-    // 1. Limpiar Estado Global
     configMazo = { bloque: "", formato: "", raza: "", viewMode: "builder" };
     mazoActual = [];
     faseOroInicial = true;
-
-    // 2. Limpiar Interfaz de Reglas
     document.getElementById('select-bloque').value = "";
     document.getElementById('select-formato').value = "";
     document.getElementById('select-raza').value = "";
-    
-    // 3. Resetear Sidebar y Vista
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
         sidebar.style.display = "none";
         sidebar.classList.add('sidebar-hidden');
         sidebar.classList.remove('sidebar-visible');
     }
-
-    // 4. Limpiar Grid de Cartas (Vista Central)
     const display = document.getElementById('card-display');
     if (display) display.innerHTML = "";
-
-    // 5. Reiniciar componentes y render
     bloquearSelectores(false);
     actualizarSetup(false);
-    renderizarMazo();
+    if (typeof renderizarMazo === 'function') renderizarMazo();
 }
 
 // ==========================================
-// 4. ESTRATEGIA (CONSTRUCCIÓN Y RENDERIZADO)
+// 4. ACCIONES DE ESTRATEGIA
 // ==========================================
-function renderizarMazo() {
-    const container = document.getElementById('deck-list-container');
-    if (!container) return;
-    container.innerHTML = "";
-
-    let totalCastillo = 0;
-    let tieneOroIni = false;
-    let nombreOroIni = "FALTA";
-    let countAliados = 0, countOrosMazo = 0, countOtros = 0;
-    let costes = { 0:0, 1:0, 2:0, 3:0, 4:0 };
-    let sumaFuerza = 0, cuentaFuerza = 0;
-    let razasMap = {};
-    let motorRobo = 0, motorAnula = 0;
-
-    mazoActual.forEach((item) => {
-        const info = cartasMyL.find(c => c.ID === item.id);
-        if (!info) return;
-
-        const textoHab = (info.Habilidad || "").trim();
-        const habLower = textoHab.toLowerCase();
-        const tipo = (info.Tipo || "").toLowerCase();
-        const esOro = tipo.includes('oro');
-
-        for (let i = 0; i < item.cant; i++) {
-            // Lógica Identificación Oro Inicial
-            if (esOro && !tieneOroIni && textoHab.length < 30) {
-                tieneOroIni = true;
-                nombreOroIni = info.Nombre;
-            } else {
-                totalCastillo++;
-                if (tipo.includes('aliado')) {
-                    countAliados++;
-                    sumaFuerza += (parseInt(info.Fuerza) || 0);
-                    cuentaFuerza++;
-                    if (info.Raza) {
-                        const r = info.Raza.trim();
-                        razasMap[r] = (razasMap[r] || 0) + 1;
-                    }
-                } else if (esOro) {
-                    countOrosMazo++;
-                } else {
-                    countOtros++; // Aquí se suman Talismanes, Armas y Tótems
-                }
-
-                if (habLower.includes("roba") || habLower.includes("busca") || habLower.includes("mira")) motorRobo++;
-                if (habLower.includes("anula") || habLower.includes("destruye") || habLower.includes("destierra")) motorAnula++;
-                
-                if (!esOro) {
-                    let c = parseInt(info.Coste) || 0;
-                    if (c > 4) c = 4;
-                    costes[c]++;
-                }
-            }
-        }
-
-        const rutaImg = obtenerRutaImagen(info);
-        const div = document.createElement('div');
-        div.className = "deck-card-item";
-        div.innerHTML = `
-            <div class="mini-preview" style="background-image: url('${rutaImg}')"></div>
-            <span class="deck-card-qty">${item.cant}x</span>
-            <div class="deck-card-info"><strong>${info.Nombre}</strong></div>
-            <button class="btn-qty-control" onclick="quitarCarta('${info.ID}')">-</button>
-        `;
-        container.appendChild(div);
-    });
-
-    if (document.getElementById('stat-oro-ini')) {
-        document.getElementById('stat-oro-ini').innerText = tieneOroIni ? "SÍ" : "NO";
-        document.getElementById('stat-oro-ini').style.color = tieneOroIni ? "#f7ef8a" : "#ff6666";
-    }
-
-    document.getElementById('total-aliados').innerText = countAliados;
-    document.getElementById('total-oros').innerText = countOrosMazo;
-    document.getElementById('total-otros').innerText = countOtros;
-    
-    // CORRECCIÓN: Unificado a Total 50 sin el "49+1"
-    const totalEstrategiaFinal = totalCastillo + (tieneOroIni ? 1 : 0);
-    const totalDisplay = document.getElementById('total-cards');
-    if (totalDisplay) {
-        totalDisplay.innerText = `TOTAL: ${totalEstrategiaFinal} / 50 CARTAS`;
-    }
-
-    document.getElementById('fuerza-promedio').innerText = cuentaFuerza > 0 ? (sumaFuerza / cuentaFuerza).toFixed(1) : "0";
-    document.getElementById('stat-robo').innerText = motorRobo;
-    document.getElementById('stat-anula').innerText = motorAnula;
-
-    let maxRaza = "NINGUNA", maxVal = 0;
-    for (let r in razasMap) { if(razasMap[r] > maxVal) { maxVal = razasMap[r]; maxRaza = r; } }
-    document.getElementById('raza-predominante').innerText = maxRaza.toUpperCase();
-
-    for (let i = 0; i <= 4; i++) {
-        const barra = document.getElementById(`bar-${i}`);
-        if (barra) {
-            const porcentaje = totalCastillo > 0 ? (costes[i] / totalCastillo) * 200 : 0;
-            barra.style.height = `${Math.min(porcentaje, 100)}%`;
-        }
-    }
-
-    const oroStatus = document.getElementById('status-oro-inicial');
-    if (oroStatus) {
-        if (tieneOroIni) {
-            oroStatus.innerHTML = `🛡️ ORO INICIAL: ${nombreOroIni}`;
-            oroStatus.style.background = "rgba(212, 175, 55, 0.1)";
-            oroStatus.style.color = "#f7ef8a";
-        } else {
-            oroStatus.innerText = "❌ FALTA ORO SIN HABILIDAD";
-            oroStatus.style.background = "rgba(255, 0, 0, 0.05)";
-            oroStatus.style.color = "#ff6666";
-        }
-    }
-}
 
 function añadirCarta(id) {
     const carta = cartasMyL.find(c => c.ID === id);
@@ -410,7 +289,7 @@ function añadirCarta(id) {
             mazoActual.push({ id: id, cant: 1, favorito: false });
         }
     }
-    renderizarMazo();
+    if (typeof renderizarMazo === 'function') renderizarMazo();
 }
 
 function quitarCarta(id) {
@@ -437,7 +316,7 @@ function quitarCarta(id) {
         if (mazoActual[indice].cant <= 0) {
             mazoActual.splice(indice, 1);
         }
-        renderizarMazo();
+        if (typeof renderizarMazo === 'function') renderizarMazo();
     }
 }
 
